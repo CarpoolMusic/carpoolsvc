@@ -2,7 +2,7 @@
 FROM node:latest
 
 # Set the working directory inside the container
-WORKDIR /usr/src/app
+WORKDIR /workspaces
 
 # Install TypeScript globally
 RUN npm install -g typescript
