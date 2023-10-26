@@ -1,19 +1,22 @@
+import "reflect-metadata"
+
 import { DataSource } from "typeorm"
+import { User} from "./User/user"
 
 // Connect to postgres db in docker container.
-const AppDataSource = new DataSource({
+const dataSource = new DataSource({
     type: "postgres",
     host: process.env.DATABASE_HOST || "localhost",
     port: 5432,
-    username: "carpooluser",
+    username: "root",
     password: "jam",
     database: "carpooldb",
-    entities: ['../src/entity/*.ts'],
+    entities: [User],
     logging: true,
     synchronize: true,
 })
 
-AppDataSource.initialize()
+dataSource.initialize()
     .then(() => {
         console.log("Data source has been initialized");
     })
@@ -21,4 +24,4 @@ AppDataSource.initialize()
         console.error("Error during Data Source initialization", err);
     })
 
-export { AppDataSource };
+export { dataSource };
