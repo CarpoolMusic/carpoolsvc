@@ -1,10 +1,10 @@
 import express from 'express';
-import { AppDataSource } from '../db/DataSource';
-import { User } from "./entity/user/User";
+import { dataSource } from '../db/DataSource';
+import { User } from "../db/User/user";
 import { setupMiddleware } from "./middleware"
 
 // Establish database connection.
-AppDataSource
+dataSource
   .initialize()
   .then(() => {
     console.log("Data source has been initialized");
