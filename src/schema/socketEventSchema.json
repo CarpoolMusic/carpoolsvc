@@ -1,58 +1,37 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "definitions": {
-        "CreateSessionRequest": {
-            "type": "object",
-            "properties": {
-                "userId": {
-                    "type": "string"
-                }
-            },
-            "required": ["userId"]
-        },
-        "CreateSessionResponse": {
-            "type": "object",
-            "properties": {
-                "sessionId": {
-                    "type": "string"
-                }
-            },
-            "required": ["sessionId"]
-        },
-        "ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "stack_trace": {
-                    "type": "string"
-                }
-            },
-            "required": ["type", "message"]
-        },
-        "Request": {
-            "type": "object",
-            "oneOf": [
-                {
-                    "$ref": "#/definitions/CreateSessionRequest"
-                }
-            ]
-        },
-        "Response": {
-            "type": "object",
-            "properties": {"status": {"type": "string"}},
-            "oneOf": [
-                {
-                    "$ref": "#/definitions/CreateSessionResponse"
-                },
-                {
-                    "$ref": "#/definitions/ErrorResponse"
-                }
-            ]
-        }
+    "CreateSessionRequest": {
+        "hostId": "string"
+    },
+    "CreateSessionResponse": {
+        "sessionId": "string"
+    },
+    "JoinSessionRequest": {
+        "sessionId": "string",
+        "userId": "string"
+    },
+    "JoinSessionResponse": {
+        "users": [
+            {
+                "socketId": "string",
+                "userId": "string"
+            }
+        ]
+    },
+    "ErrorResponse": {
+        "type": "string",
+        "message": "string",
+        "stack_trace": "string"
+    },
+    "Request": {
+        "oneOf": [
+            { "$ref": "#/definitions/CreateSessionRequest" }
+        ]
+    },
+    "Response": {
+        "status": { "type": "string" },
+        "oneOf": [
+            { "$ref": "#/definitions/CreateSessionResponse" },
+            { "$ref": "#/definitions/ErrorResponse" }
+        ]
     }
 }

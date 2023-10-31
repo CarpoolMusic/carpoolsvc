@@ -1,6 +1,10 @@
 // Define constants for all socket event names
-const EVENTS = {
+export const EVENTS = {
+    CONNECTED: 'connected',
     CREATE_SESSION: 'createSession',
     SESSION_CREATED: 'sessionCreated',
     JOIN_SESSION: 'joinSession',
+    SESSION_JOINED: 'sessionJoined',
+    DISCONNECTED: 'disconnected',
+    ERROR: 'error',
 }

@@ -8,56 +8,44 @@
 // match the expected interface, even if the JSON is valid.
 
 export interface SocketEventSchema {
-    $schema:     string;
-    definitions: Definitions;
-}
-
-export interface Definitions {
     CreateSessionRequest:  CreateSessionRequest;
     CreateSessionResponse: CreateSessionResponse;
+    JoinSessionRequest:    JoinSessionRequest;
+    JoinSessionResponse:   JoinSessionResponse;
     ErrorResponse:         ErrorResponse;
     Request:               Request;
     Response:              Response;
 }
 
 export interface CreateSessionRequest {
-    type:       string;
-    properties: CreateSessionRequestProperties;
-    required:   string[];
-}
-
-export interface CreateSessionRequestProperties {
-    userId: UserID;
-}
-
-export interface UserID {
-    type: string;
+    hostId: string;
 }
 
 export interface CreateSessionResponse {
-    type:       string;
-    properties: CreateSessionResponseProperties;
-    required:   string[];
-}
-
-export interface CreateSessionResponseProperties {
-    sessionId: UserID;
+    sessionId: string;
 }
 
 export interface ErrorResponse {
-    type:       string;
-    properties: ErrorResponseProperties;
-    required:   string[];
+    type:        string;
+    message:     string;
+    stack_trace: string;
 }
 
-export interface ErrorResponseProperties {
-    type:        UserID;
-    message:     UserID;
-    stack_trace: UserID;
+export interface JoinSessionRequest {
+    sessionId: string;
+    userId:    string;
+}
+
+export interface JoinSessionResponse {
+    users: User[];
+}
+
+export interface User {
+    socketId: string;
+    userId:   string;
 }
 
 export interface Request {
-    type:  string;
     oneOf: OneOf[];
 }
 
@@ -66,13 +54,12 @@ export interface OneOf {
 }
 
 export interface Response {
-    type:       string;
-    properties: ResponseProperties;
-    oneOf:      OneOf[];
+    status: Status;
+    oneOf:  OneOf[];
 }
 
-export interface ResponseProperties {
-    status: UserID;
+export interface Status {
+    type: string;
 }
 
 // Converts JSON strings to/from your types
@@ -241,58 +228,47 @@ function r(name: string) {
 
 const typeMap: any = {
     "SocketEventSchema": o([
-        { json: "$schema", js: "$schema", typ: "" },
-        { json: "definitions", js: "definitions", typ: r("Definitions") },
-    ], false),
-    "Definitions": o([
         { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: r("CreateSessionRequest") },
         { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: r("CreateSessionResponse") },
+        { json: "JoinSessionRequest", js: "JoinSessionRequest", typ: r("JoinSessionRequest") },
+        { json: "JoinSessionResponse", js: "JoinSessionResponse", typ: r("JoinSessionResponse") },
         { json: "ErrorResponse", js: "ErrorResponse", typ: r("ErrorResponse") },
         { json: "Request", js: "Request", typ: r("Request") },
         { json: "Response", js: "Response", typ: r("Response") },
     ], false),
     "CreateSessionRequest": o([
-        { json: "type", js: "type", typ: "" },
-        { json: "properties", js: "properties", typ: r("CreateSessionRequestProperties") },
-        { json: "required", js: "required", typ: a("") },
-    ], false),
-    "CreateSessionRequestProperties": o([
-        { json: "userId", js: "userId", typ: r("UserID") },
-    ], false),
-    "UserID": o([
-        { json: "type", js: "type", typ: "" },
+        { json: "hostId", js: "hostId", typ: "" },
     ], false),
     "CreateSessionResponse": o([
-        { json: "type", js: "type", typ: "" },
-        { json: "properties", js: "properties", typ: r("CreateSessionResponseProperties") },
-        { json: "required", js: "required", typ: a("") },
-    ], false),
-    "CreateSessionResponseProperties": o([
-        { json: "sessionId", js: "sessionId", typ: r("UserID") },
+        { json: "sessionId", js: "sessionId", typ: "" },
     ], false),
     "ErrorResponse": o([
         { json: "type", js: "type", typ: "" },
-        { json: "properties", js: "properties", typ: r("ErrorResponseProperties") },
-        { json: "required", js: "required", typ: a("") },
+        { json: "message", js: "message", typ: "" },
+        { json: "stack_trace", js: "stack_trace", typ: "" },
     ], false),
-    "ErrorResponseProperties": o([
-        { json: "type", js: "type", typ: r("UserID") },
-        { json: "message", js: "message", typ: r("UserID") },
-        { json: "stack_trace", js: "stack_trace", typ: r("UserID") },
+    "JoinSessionRequest": o([
+        { json: "sessionId", js: "sessionId", typ: "" },
+        { json: "userId", js: "userId", typ: "" },
+    ], false),
+    "JoinSessionResponse": o([
+        { json: "users", js: "users", typ: a(r("User")) },
+    ], false),
+    "User": o([
+        { json: "socketId", js: "socketId", typ: "" },
+        { json: "userId", js: "userId", typ: "" },
     ], false),
     "Request": o([
-        { json: "type", js: "type", typ: "" },
         { json: "oneOf", js: "oneOf", typ: a(r("OneOf")) },
     ], false),
     "OneOf": o([
         { json: "$ref", js: "$ref", typ: "" },
     ], false),
     "Response": o([
-        { json: "type", js: "type", typ: "" },
-        { json: "properties", js: "properties", typ: r("ResponseProperties") },
+        { json: "status", js: "status", typ: r("Status") },
         { json: "oneOf", js: "oneOf", typ: a(r("OneOf")) },
     ], false),
-    "ResponseProperties": o([
-        { json: "status", js: "status", typ: r("UserID") },
+    "Status": o([
+        { json: "type", js: "type", typ: "" },
     ], false),
 };

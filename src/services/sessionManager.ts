@@ -5,6 +5,7 @@
  * This is managed in memory for now, but could be extended to use a database in the future.
  */
 import Session from '../models/session';
+import { User } from '../schema/socketEventSchema';
 
 class SessionManager {
     private static instance: SessionManager;
@@ -21,14 +22,24 @@ class SessionManager {
         return this.instance;
     }
 
-    public createSession(userId: string): string {
-        const session = new Session(userId);
-        this.sessions.set(session.sessionId, session);
-        return session.sessionId;
+    public createSession(host: User): string {
+        const session = new Session(host);
+        const sessionId = session.getSessionId();
+        this.sessions.set(sessionId, session);
+        return sessionId;
     }
 
     public getSession(sessionId: string): Session | undefined {
         return this.sessions.get(sessionId);
+    }
+
+    public joinSession(sessionId: string, User: User): void {
+        const session = this.sessions.get(sessionId);
+        if (session) {
+            session.join(User);
+        } else {
+            throw new Error('Invalid session ID ( join session )');
+        }
     }
 
     public deleteSession(sessionId: string): void {
