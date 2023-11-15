@@ -5,6 +5,11 @@ export const EVENTS = {
     SESSION_CREATED: 'sessionCreated',
     JOIN_SESSION: 'joinSession',
     SESSION_JOINED: 'sessionJoined',
+    USER_JOINED: 'userJoined',
     DISCONNECTED: 'disconnected',
+    ADD_SONG: 'addSong',
+    SONG_ADDED: 'songAdded',
+    UPDATE_QUEUE: 'updateQueue',
+    QUEUE_UPDATED: 'queueUpdated',
     ERROR: 'error',
 }

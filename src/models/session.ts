@@ -3,7 +3,6 @@
  * Represents a single session, holding data pertinent to that session such as the host ID, session ID, Users, and queue.
  */
 
-import { makePaymentTxnWithSuggestedParams } from 'algosdk';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../schema/socketEventSchema';
 
@@ -18,13 +17,15 @@ interface Song {
 class Session {
     private hostSocketID: string;
     private sessionId: string;
-    private Users: Map<string, string>;
+    private sessionName: string;
+    private users: Map<string, string>;
     private queue: Song[];
 
-    constructor(host: User) {
+    constructor(host: User, sessionName: string) {
         this.hostSocketID = host.socketId;
         this.sessionId = uuidv4();
-        this.Users = new Map([[host.socketId, host.userId]]);
+        this.sessionName = sessionName;
+        this.users = new Map([[host.socketId, host.userId]]);
         this.queue = [];
     }
 
@@ -33,22 +34,22 @@ class Session {
     }
 
     public join(User: User): void {
-        if (this.Users.has(User.socketId)) {
+        if (this.users.has(User.socketId)) {
             throw new Error("User already exists");
         }
-        this.Users.set(User.socketId, User.userId);
+        this.users.set(User.socketId, User.userId);
     }
 
     public remove(socketId: string): void {
-        this.Users.delete(socketId);
+        this.users.delete(socketId);
     }
 
     public isUser(socketId: string): boolean {
-        return this.Users.has(socketId);
+        return this.users.has(socketId);
     }
     
     public getUsers() : User[] {
-        return Array.from(this.Users).map(([socketId, userId]) => ({ socketId, userId }));
+        return Array.from(this.users).map(([socketId, userId]) => ({ socketId, userId }));
     }
 
     public isHost(socketId: string): boolean {

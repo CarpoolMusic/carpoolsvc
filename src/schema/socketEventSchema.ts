@@ -18,7 +18,8 @@ export interface SocketEventSchema {
 }
 
 export interface CreateSessionRequest {
-    hostId: string;
+    hostId:      string;
+    sessionName: string;
 }
 
 export interface CreateSessionResponse {
@@ -238,6 +239,7 @@ const typeMap: any = {
     ], false),
     "CreateSessionRequest": o([
         { json: "hostId", js: "hostId", typ: "" },
+        { json: "sessionName", js: "sessionName", typ: "" },
     ], false),
     "CreateSessionResponse": o([
         { json: "sessionId", js: "sessionId", typ: "" },

@@ -1,6 +1,7 @@
 {
     "CreateSessionRequest": {
-        "hostId": "string"
+        "hostId": "string",
+        "sessionName": "string"
     },
     "CreateSessionResponse": {
         "sessionId": "string"
@@ -16,6 +17,20 @@
                 "userId": "string"
             }
         ]
+    },
+    "AddSongRequest": {
+        "id": "string",
+        "title": "string",
+        "artist": "string",
+        "album": "string",
+        "duratin": "string",
+        "uri": "string",
+        "artworkURL": "string",
+        "artwork": "string",
+        "votes": "string"
+    },
+    "AddSongResponse": {
+
     },
     "ErrorResponse": {
         "type": "string",

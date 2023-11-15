@@ -8,22 +8,14 @@ import Session from '../models/session';
 import { User } from '../schema/socketEventSchema';
 
 class SessionManager {
-    private static instance: SessionManager;
     private sessions: Map<string, Session>;
 
-    private constructor() {
+    constructor() {
         this.sessions = new Map<string, Session>();
     }
 
-    public static getInstance(): SessionManager {
-        if (!this.instance) {
-            this.instance = new SessionManager();
-        }
-        return this.instance;
-    }
-
-    public createSession(host: User): string {
-        const session = new Session(host);
+    public createSession(host: User, sessionName: string): string {
+        const session = new Session(host, sessionName);
         const sessionId = session.getSessionId();
         this.sessions.set(sessionId, session);
         return sessionId;
@@ -47,4 +39,4 @@ class SessionManager {
     }
 }
 
-export const sessionManager = SessionManager.getInstance();
+export default SessionManager;
