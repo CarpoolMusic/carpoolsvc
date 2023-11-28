@@ -3,6 +3,7 @@
         "hostId": "string",
         "sessionName": "string"
     },
+
     "CreateSessionResponse": {
         "sessionId": "string"
     },
@@ -18,35 +19,47 @@
             }
         ]
     },
-    "AddSongRequest": {
+    "Song": {
+        "service": "string",
         "id": "string",
         "title": "string",
         "artist": "string",
         "album": "string",
-        "duratin": "string",
-        "uri": "string",
-        "artworkURL": "string",
-        "artwork": "string",
-        "votes": "string"
+        "votes": 0
     },
-    "AddSongResponse": {
-
+    "AddSongRequest": {
+        "sessionId": "string",
+        "song": {
+            "service": "string",
+            "id": "string",
+            "title": "string",
+            "artist": "string",
+            "album": "string",
+            "votes": 0
+        }
+    },
+    "SongAddedEvent": {
+        "song": {
+            "service": "string",
+            "id": "string",
+            "title": "string",
+            "artist": "string",
+            "album": "string",
+            "votes": 0
+        }
+    },
+    "VoteSongRequest": {
+        "sessionId": "string",
+        "songId": "string",
+        "vote": 0
+    },
+    "VoteSongEvent": {
+        "songId": "string",
+        "vote": 0
     },
     "ErrorResponse": {
         "type": "string",
         "message": "string",
         "stack_trace": "string"
-    },
-    "Request": {
-        "oneOf": [
-            { "$ref": "#/definitions/CreateSessionRequest" }
-        ]
-    },
-    "Response": {
-        "status": { "type": "string" },
-        "oneOf": [
-            { "$ref": "#/definitions/CreateSessionResponse" },
-            { "$ref": "#/definitions/ErrorResponse" }
-        ]
     }
 }

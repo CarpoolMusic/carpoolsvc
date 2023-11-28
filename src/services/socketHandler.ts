@@ -4,10 +4,9 @@
  * Entry point for all socket interactions and acts as a bridge between the socket server and the rest of the application.
  */
 import { Server, Socket } from 'socket.io';
-import SessionManager from './sessionManager';
-import Session  from '../models/session';
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, ErrorResponse, User } from "../schema/socketEventSchema";
 import { EVENTS } from '../models/events';
+import { AddSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, Song, Convert } from "../schema/socketEventSchema";
+import SessionManager from './sessionManager';
 
 export class SocketHandler {
     private io: Server;
@@ -27,7 +26,6 @@ export class SocketHandler {
             // Listen for create session event
             socket.on(EVENTS.CREATE_SESSION, (createSessionRequest: CreateSessionRequest) => {
                 console.log("createSessionRequest");
-                console.log("THIS IS CREATE SESSION ", createSessionRequest.hostId);
                 this.handleCreateSession(socket, createSessionRequest);
             });
 
@@ -38,9 +36,17 @@ export class SocketHandler {
             });
 
             // Listen for add song event.
-            // socket.on(EVENTS.SONG_ADDED, (addSongRequest: AddSongRequest)=> {
+            socket.on(EVENTS.ADD_SONG, (addSongRequestBuffer: Buffer)=> {
+                let json = JSON.stringify(addSongRequestBuffer)
+                console.log(json)
+                console.log(json);
+                // this.handleAddSong(socket, addSongRequest);
+            });
 
-            // });
+            socket.on(EVENTS.VOTE_SONG, (voteSongRequest: VoteSongRequest) => {
+                console.log("voteSongRequest");
+                this.handleVoteSong(socket, voteSongRequest);
+            });
 
             socket.on('disconnect', () => {
                 socket.emit(EVENTS.DISCONNECTED);
@@ -57,17 +63,13 @@ export class SocketHandler {
         const user: User = { socketId: socketID, userId: hostId };
         const sessionId: string = this.sessionManager.createSession(user, sessionName);
 
-        console.log("HANDLING CREATE SESSION");
-
         // Join the user to the socket session room
         socket.join(sessionId);
 
         // Build createSessionResponse
         const createSessionResponse: CreateSessionResponse = {
             sessionId: sessionId
-        };
-        console.log("resp", createSessionResponse);
-        
+        }; 
         
         // Send the session ID back to the client
         socket.emit(EVENTS.SESSION_CREATED, createSessionResponse);
@@ -85,7 +87,7 @@ export class SocketHandler {
             socket.join(sessionId);
 
             // Notify the room that the user has joined
-            socket.to(sessionId).emit(EVENTS.USER_JOINED);
+            socket.to(sessionId).emit(EVENTS.USER_JOINED, user);
             
             // Build the response
             const joinSessionResponse: JoinSessionResponse = {
@@ -105,9 +107,44 @@ export class SocketHandler {
         }
     }
 
-    // private handleJoinSession(joinSessionRequest: JoinSessi): void {
-    //     const session = sessionManager.getSession(sessionId);
-    // }
+    private handleAddSong(socket: Socket, addSongRequest: AddSongRequest): void {
+        console.log("handleAddSong");
 
-    // ... Other helper methods ...
+        const sessionId = addSongRequest.sessionId;
+        const song: Song = addSongRequest.song;
+        const session = this.sessionManager.getSession(sessionId);
+
+        if (session) {
+            // Build the broadcast event
+            const songAddedEvent: SongAddedEvent = {
+                song: song
+            };
+            session.addSong(song);
+            this.io.in(sessionId).emit(EVENTS.SONG_ADDED, songAddedEvent);
+        } else {
+            // Build error response
+            console.log("Could not find session to broadcast song added");
+        }
+    }
+
+    private handleVoteSong(socket: Socket, voteSongRequest: VoteSongRequest): void {
+
+        console.log("handleVoteSong");
+
+        const sessionId = voteSongRequest.sessionId;
+        const songId = voteSongRequest.songId;
+        const vote = voteSongRequest.vote;
+        const session = this.sessionManager.getSession(sessionId);
+
+        if (session) {
+            session.voteOnSong(songId, vote);
+            const voteSongEvent: VoteSongEvent = {
+                songId: songId,
+                vote: vote
+            }
+            this.io.in(sessionId).emit(EVENTS.SONG_VOTED, voteSongEvent);
+        } else {
+            console.log("Error voting on song");
+        }
+    }
 }

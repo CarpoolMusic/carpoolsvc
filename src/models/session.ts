@@ -4,29 +4,22 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../schema/socketEventSchema';
-
-interface Song {
-    songID: string;
-    title: string;
-    artist: string;
-    addedBy: string;
-    votes: number;
-}
+import { User, Song } from '../schema/socketEventSchema';
+import Queue from './queue';
 
 class Session {
     private hostSocketID: string;
     private sessionId: string;
     private sessionName: string;
     private users: Map<string, string>;
-    private queue: Song[];
+    private queue: Queue;
 
     constructor(host: User, sessionName: string) {
         this.hostSocketID = host.socketId;
         this.sessionId = uuidv4();
         this.sessionName = sessionName;
         this.users = new Map([[host.socketId, host.userId]]);
-        this.queue = [];
+        this.queue = new Queue();
     }
 
     public getSessionId(): string {
@@ -56,20 +49,40 @@ class Session {
         return this.hostSocketID === socketId;
     }
 
+    // Queue methods
     public addSong(song: Song): void {
-        this.queue.push(song);
+        this.queue.enqueue(song);
     }
 
-    public removeSong(songId: string): void {
-        this.queue = this.queue.filter(song => song.songID !== songId);
+    public getNextSong(): Song | undefined {
+        return this.queue.dequeue();
+    }
+
+    public viewNextSong(): Song {
+        return this.queue.peek();
+    }
+
+    public viewLastSongAdded(): Song {
+        return this.queue.peekTail();
+    }
+
+    public getNumVotes(songId: string) {
+        const song = this.queue.getQueue().find(song => song.id === songId);
+        return song ? song.votes : 0;
     }
 
     public voteOnSong(songId: string, vote: number): void {
-        const song = this.queue.find(song => song.songID === songId);
-        if (song) {
-            song.votes += vote;
-        }
+        this.queue.voteOnSong(songId, vote);
     }
+
+    public removeSong(songId: string): void {
+        this.queue.removeSong(songId);
+    }
+
+    public queueLength(): number {
+        return this.queue.getQueueLength();
+    }
+
 }
 
 export default Session; 

@@ -9,7 +9,7 @@ export const EVENTS = {
     DISCONNECTED: 'disconnected',
     ADD_SONG: 'addSong',
     SONG_ADDED: 'songAdded',
-    UPDATE_QUEUE: 'updateQueue',
-    QUEUE_UPDATED: 'queueUpdated',
+    VOTE_SONG: 'voteSong',
+    SONG_VOTED: 'songVoted',
     ERROR: 'error',
 }

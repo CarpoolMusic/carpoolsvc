@@ -1,15 +1,16 @@
 import { createServer } from 'http';
 import ioClient from 'socket.io-client';
 import { Server } from 'socket.io';
-import { SocketHandler } from '../../src/services/socketHandler';
-import SessionManager from '../../src/services/sessionManager';
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, User } from '../../src/schema/socketEventSchema';
-import { EVENTS } from '../../src/models/events';
+import { SocketHandler } from '../src/services/socketHandler';
+import SessionManager from '../src/services/sessionManager';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/schema/socketEventSchema';
+import { EVENTS } from '../src/models/events';
 
 // Test configuration constants
 const testUserId = 'testUserId';
 const testSessionName = 'testSession';
 const otherUserId = 'otherUserId';
+const testSongId = 'testSongId';
 
 // Server and client socket instances
 let ioServer: Server;
@@ -27,8 +28,11 @@ let joinSessionResolve: (value: JoinSessionResponse) => void;
 let userJoinedPromise: Promise<User>
 let userJoinedResolve: (value: User) => void;
 
-let queueUpdatedPromise: Promise<void>;
-let queueUpdatedResolve: () => void;
+let songAddedPromise: Promise<SongAddedEvent>;
+let songAddedResolve: (value: SongAddedEvent) => void;
+
+let voteSongPromise: Promise<VoteSongEvent>;
+let voteSongResolve: (value: VoteSongEvent) => void;
 
 // Utility functions for setup and assertions
 const setupServerAndSockets = (): Promise<void> => {
@@ -72,8 +76,12 @@ const resetPromises = () => {
         userJoinedResolve = resolve; 
     });
 
-    queueUpdatedPromise = new Promise((resolve) => {
-        queueUpdatedResolve = resolve;
+    songAddedPromise = new Promise((resolve) => {
+        songAddedResolve = resolve;
+    });
+
+    voteSongPromise = new Promise((resolve) => {
+        voteSongResolve = resolve;
     });
 };
 
@@ -85,11 +93,6 @@ const setupGlobalListeners = (): void => {
         }
     });
 
-    clientSocket.on(EVENTS.SESSION_JOINED, (joinSessionResponse: JoinSessionResponse) => {
-        if (joinSessionResponse) {
-            joinSessionResolve(joinSessionResponse); 
-        }
-    });
     otherClientSocket.on(EVENTS.SESSION_JOINED, (joinSessionResponse: JoinSessionResponse) => {
         if (joinSessionResponse) {
             joinSessionResolve(joinSessionResponse); 
@@ -102,9 +105,20 @@ const setupGlobalListeners = (): void => {
         }
     });
 
-    clientSocket.on(EVENTS.QUEUE_UPDATED, () => {
-        if (queueUpdatedResolve) {
-            queueUpdatedResolve();
+    otherClientSocket.on(EVENTS.SONG_ADDED, (songAddedEvent: SongAddedEvent) => {
+        if (songAddedResolve) {
+            songAddedResolve(songAddedEvent);
+        }
+    });
+    clientSocket.on(EVENTS.SONG_ADDED, (songAddedEvent: SongAddedEvent) => {
+        if (songAddedResolve) {
+            songAddedResolve(songAddedEvent);
+        }
+    });
+
+    otherClientSocket.on(EVENTS.SONG_VOTED, (voteSongEvent: VoteSongEvent) => {
+        if (voteSongResolve) {
+            voteSongResolve(voteSongEvent);
         }
     });
 
@@ -120,6 +134,8 @@ const closeConnections = (): void => {
 const createTestSession = (userId: string, sessionName: string): Promise<string> => {
     let testSessionId: string;
     const createSessionRequest: CreateSessionRequest = { hostId: userId, sessionName: sessionName };
+
+    // Create the session
     clientSocket.emit(EVENTS.CREATE_SESSION, createSessionRequest);
 
     return sessionCreatedPromise.then((createSessionResponse: CreateSessionResponse) => {
@@ -128,17 +144,46 @@ const createTestSession = (userId: string, sessionName: string): Promise<string>
     });
 };
 
+const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
+    console.log("TEST SESSION ID ",  testSessionId);
+    const song: Song = {
+        service: 'testService',
+        id: testSongId,
+        title: 'testSongTitle',
+        artist: 'testSongArtist',
+        album: 'testSongAlbum',
+        votes: 0,
+    }
+    const addSongRequest: AddSongRequest = {
+        sessionId: testSessionId,
+        song: song,
+    };
+
+    // Add the song
+    clientSocket.emit(EVENTS.ADD_SONG, addSongRequest);
+
+    return songAddedPromise.then((songAddedEvent: SongAddedEvent) => {
+        expect(songAddedEvent).toBeDefined();
+    });
+};
+
+
 export {
     setupServerAndSockets,
     setupGlobalListeners,
+    resetPromises,
     closeConnections,
     createTestSession,
+    addTestSongToTestSession,
     testUserId,
     testSessionName,
     otherUserId,
+    testSongId,
     sessionCreatedPromise,
     joinSessionPromise,
     userJoinedPromise,
+    songAddedPromise,
+    voteSongPromise,
     clientSocket,
     otherClientSocket,
     sessionManager,
