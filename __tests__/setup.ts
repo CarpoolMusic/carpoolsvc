@@ -136,7 +136,7 @@ const createTestSession = (userId: string, sessionName: string): Promise<string>
     const createSessionRequest: CreateSessionRequest = { hostId: userId, sessionName: sessionName };
 
     // Create the session
-    clientSocket.emit(EVENTS.CREATE_SESSION, createSessionRequest);
+    clientSocket.emit(EVENTS.CREATE_SESSION, JSON.stringify(createSessionRequest));
 
     return sessionCreatedPromise.then((createSessionResponse: CreateSessionResponse) => {
         expect(createSessionResponse.sessionId).toBeDefined();
@@ -147,20 +147,23 @@ const createTestSession = (userId: string, sessionName: string): Promise<string>
 const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
     console.log("TEST SESSION ID ",  testSessionId);
     const song: Song = {
-        service: 'testService',
+        votes: 0,
         id: testSongId,
         title: 'testSongTitle',
         artist: 'testSongArtist',
         album: 'testSongAlbum',
-        votes: 0,
+        service: 'testService',
     }
     const addSongRequest: AddSongRequest = {
         sessionId: testSessionId,
         song: song,
     };
 
+    // Simulate serialization
+    const jsonRequest: string = JSON.stringify(addSongRequest);
+
     // Add the song
-    clientSocket.emit(EVENTS.ADD_SONG, addSongRequest);
+    clientSocket.emit(EVENTS.ADD_SONG, jsonRequest);
 
     return songAddedPromise.then((songAddedEvent: SongAddedEvent) => {
         expect(songAddedEvent).toBeDefined();

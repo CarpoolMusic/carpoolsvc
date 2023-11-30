@@ -22,6 +22,7 @@ import {
     sessionManager,
     addTestSongToTestSession
 } from '../setup';
+import { serialize } from 'v8';
 
 let testSessionId: string;
 
@@ -56,7 +57,7 @@ describe('create session event', () => {
         };
 
         // Emit the create session event from the client socket.
-        clientSocket.emit(EVENTS.CREATE_SESSION, createSessionRequest);
+        clientSocket.emit(EVENTS.CREATE_SESSION, JSON.stringify(createSessionRequest));
     });
 
     it("should emit a session created event", async () => {
@@ -77,7 +78,7 @@ describe('join session event', () => {
             sessionId: testSessionId,
             userId: otherUserId,
         };
-        otherClientSocket.emit(EVENTS.JOIN_SESSION, (joinSessionRequest))
+        otherClientSocket.emit(EVENTS.JOIN_SESSION, JSON.stringify(joinSessionRequest))
     });
 
     it("Host should be notified that new user has joined", async () => {
@@ -118,7 +119,7 @@ describe('adding a song to session', () => {
             song: testSong
         };
         // Make the add song request
-        clientSocket.emit(EVENTS.ADD_SONG, addSongRequest);
+        clientSocket.emit(EVENTS.ADD_SONG, JSON.stringify(addSongRequest));
     });
 
     it("Should add song to queue for all users in session", async () => {
@@ -144,7 +145,7 @@ describe('voting on a song', () => {
             vote: 1
         };
         // Make the vote request
-        clientSocket.emit(EVENTS.VOTE_SONG, voteRequest);
+        clientSocket.emit(EVENTS.VOTE_SONG, JSON.stringify(voteRequest));
     });
 
     it("Should notify all users in session that a song has been voted on", async () => {
@@ -166,7 +167,7 @@ describe('voting on a song', () => {
             vote: -1
         };
         // Make the vote request
-        clientSocket.emit(EVENTS.VOTE_SONG, voteRequest);
+        clientSocket.emit(EVENTS.VOTE_SONG, JSON.stringify(voteRequest));
     });
 
     it("Should notify all users in session that a song has been voted on", async () => {

@@ -3,6 +3,7 @@
  * Manages socket connections, disconnections, and message routing.
  * Entry point for all socket interactions and acts as a bridge between the socket server and the rest of the application.
  */
+import { create } from 'domain';
 import { Server, Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
 import { AddSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, Song, Convert } from "../schema/socketEventSchema";
@@ -24,27 +25,32 @@ export class SocketHandler {
             socket.emit(EVENTS.CONNECTED);
 
             // Listen for create session event
-            socket.on(EVENTS.CREATE_SESSION, (createSessionRequest: CreateSessionRequest) => {
+            socket.on(EVENTS.CREATE_SESSION, (data: Buffer) => {
                 console.log("createSessionRequest");
+                const createSessionRequest: CreateSessionRequest = JSON.parse(data.toString());
                 this.handleCreateSession(socket, createSessionRequest);
             });
 
             // Listen for join session event
-            socket.on(EVENTS.JOIN_SESSION, (joinSessionRequest: JoinSessionRequest) => {
+            socket.on(EVENTS.JOIN_SESSION, (data: Buffer) => {
                 console.log("joinSessionRequest");
-                this.handleJoinSession(socket, joinSessionRequest);
+                this.handleJoinSession(socket, JSON.parse(data.toString()));
             });
 
             // Listen for add song event.
-            socket.on(EVENTS.ADD_SONG, (addSongRequestBuffer: Buffer)=> {
-                let json = JSON.stringify(addSongRequestBuffer)
-                console.log(json)
-                console.log(json);
-                // this.handleAddSong(socket, addSongRequest);
+            socket.on(EVENTS.ADD_SONG, (data: Buffer)=> {
+                console.log("Add song request");
+                try {
+                    this.handleAddSong(socket, JSON.parse(data.toString()));
+                } catch (e) {
+                    console.log(e);
+                }
             });
 
-            socket.on(EVENTS.VOTE_SONG, (voteSongRequest: VoteSongRequest) => {
+            socket.on(EVENTS.VOTE_SONG, (data: Buffer) => {
                 console.log("voteSongRequest");
+
+                const voteSongRequest: VoteSongRequest = JSON.parse(data.toString());
                 this.handleVoteSong(socket, voteSongRequest);
             });
 
@@ -130,6 +136,9 @@ export class SocketHandler {
     private handleVoteSong(socket: Socket, voteSongRequest: VoteSongRequest): void {
 
         console.log("handleVoteSong");
+
+        console.log(voteSongRequest);
+        console.log(voteSongRequest.sessionId);
 
         const sessionId = voteSongRequest.sessionId;
         const songId = voteSongRequest.songId;
