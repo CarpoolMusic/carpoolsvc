@@ -153,6 +153,7 @@ const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
         title: 'testSongTitle',
         artist: 'testSongArtist',
         album: 'testSongAlbum',
+        artworkUrl: 'testArtworkUrl',
         service: 'testService',
     }
     const addSongRequest: AddSongRequest = {

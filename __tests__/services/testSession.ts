@@ -106,9 +106,11 @@ describe('adding a song to session', () => {
     const testSong: Song = {
         service: "Test service",
         id: "Test ID",
+        uri: "Test URI",
         title: "Test Song",
         artist: "Test Artist",
         album: "Test Album",
+        artworkUrl: "Test artwork url", 
         votes: 0,
     };
 
@@ -128,6 +130,12 @@ describe('adding a song to session', () => {
 
         expect(songAddedEvent).toBeDefined();
         expect(song.id).toBe(testSong.id);
+        expect(song.uri).toBe(testSong.uri);
+        expect(song.title).toBe(testSong.title);
+        expect(song.artist).toBe(testSong.artist);
+        expect(song.album).toBe(testSong.album);
+        expect(song.artworkUrl).toBe(testSong.artworkUrl);
+        expect(song.votes).toBe(testSong.votes);
 
         const session = sessionManager.getSession(testSessionId);
         // assert that the song was added to the session
