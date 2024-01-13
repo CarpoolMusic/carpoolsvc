@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --verbose --coverage __tests__/services",
     "start": "ts-node src/index.ts",
     "build": "tsc",
     "serve": "node dist/index.js"

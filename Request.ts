@@ -1,38 +1,15 @@
 // To parse this data:
 //
-//   import { Convert, SocketEventSchema } from "./file";
+//   import { Convert, Request } from "./file";
 //
-//   const socketEventSchema = Convert.toSocketEventSchema(json);
+//   const request = Convert.toRequest(json);
 //
 // These functions will throw an error if the JSON doesn't
 // match the expected interface, even if the JSON is valid.
 
-export interface SocketEventSchema {
-    CreateSessionRequest:  CreateSessionRequest;
-    CreateSessionResponse: CreateSessionResponse;
-    JoinSessionRequest:    JoinSessionRequest;
-    JoinSessionResponse:   JoinSessionResponse;
-    Song:                  Song;
-    AddSongRequest:        AddSongRequest;
-    SongAddedEvent:        SongAddedEvent;
-    VoteSongRequest:       VoteSongRequest;
-    VoteSongEvent:         VoteSongEvent;
-    ErrorResponse:         ErrorResponse;
-}
-
-export interface AddSongRequest {
-    sessionId: string;
-    song:      Song;
-}
-
-export interface Song {
-    service: string;
-    id:      string;
-    title:   string;
-    artist:  string;
-    album:   string;
-    votes:   number;
-    uri?:    string;
+export interface Request {
+    CreateSessionRequest?:  CreateSessionRequest;
+    CreateSessionResponse?: CreateSessionResponse;
 }
 
 export interface CreateSessionRequest {
@@ -44,50 +21,15 @@ export interface CreateSessionResponse {
     sessionId: string;
 }
 
-export interface ErrorResponse {
-    type:        string;
-    message:     string;
-    stack_trace: string;
-}
-
-export interface JoinSessionRequest {
-    sessionId: string;
-    userId:    string;
-}
-
-export interface JoinSessionResponse {
-    users: User[];
-}
-
-export interface User {
-    socketId: string;
-    userId:   string;
-}
-
-export interface SongAddedEvent {
-    song: Song;
-}
-
-export interface VoteSongEvent {
-    songId: string;
-    vote:   number;
-}
-
-export interface VoteSongRequest {
-    sessionId: string;
-    songId:    string;
-    vote:      number;
-}
-
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
 export class Convert {
-    public static toSocketEventSchema(json: string): SocketEventSchema {
-        return cast(JSON.parse(json), r("SocketEventSchema"));
+    public static toRequest(json: string): Request {
+        return cast(JSON.parse(json), r("Request"));
     }
 
-    public static socketEventSchemaToJson(value: SocketEventSchema): string {
-        return JSON.stringify(uncast(value, r("SocketEventSchema")), null, 2);
+    public static requestToJson(value: Request): string {
+        return JSON.stringify(uncast(value, r("Request")), null, 2);
     }
 }
 
@@ -244,30 +186,9 @@ function r(name: string) {
 }
 
 const typeMap: any = {
-    "SocketEventSchema": o([
-        { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: r("CreateSessionRequest") },
-        { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: r("CreateSessionResponse") },
-        { json: "JoinSessionRequest", js: "JoinSessionRequest", typ: r("JoinSessionRequest") },
-        { json: "JoinSessionResponse", js: "JoinSessionResponse", typ: r("JoinSessionResponse") },
-        { json: "Song", js: "Song", typ: r("Song") },
-        { json: "AddSongRequest", js: "AddSongRequest", typ: r("AddSongRequest") },
-        { json: "SongAddedEvent", js: "SongAddedEvent", typ: r("SongAddedEvent") },
-        { json: "VoteSongRequest", js: "VoteSongRequest", typ: r("VoteSongRequest") },
-        { json: "VoteSongEvent", js: "VoteSongEvent", typ: r("VoteSongEvent") },
-        { json: "ErrorResponse", js: "ErrorResponse", typ: r("ErrorResponse") },
-    ], false),
-    "AddSongRequest": o([
-        { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "song", js: "song", typ: r("Song") },
-    ], false),
-    "Song": o([
-        { json: "service", js: "service", typ: "" },
-        { json: "id", js: "id", typ: "" },
-        { json: "title", js: "title", typ: "" },
-        { json: "artist", js: "artist", typ: "" },
-        { json: "album", js: "album", typ: "" },
-        { json: "votes", js: "votes", typ: 0 },
-        { json: "uri", js: "uri", typ: u(undefined, "") },
+    "Request": o([
+        { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: u(undefined, r("CreateSessionRequest")) },
+        { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: u(undefined, r("CreateSessionResponse")) },
     ], false),
     "CreateSessionRequest": o([
         { json: "hostId", js: "hostId", typ: "" },
@@ -275,33 +196,5 @@ const typeMap: any = {
     ], false),
     "CreateSessionResponse": o([
         { json: "sessionId", js: "sessionId", typ: "" },
-    ], false),
-    "ErrorResponse": o([
-        { json: "type", js: "type", typ: "" },
-        { json: "message", js: "message", typ: "" },
-        { json: "stack_trace", js: "stack_trace", typ: "" },
-    ], false),
-    "JoinSessionRequest": o([
-        { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "userId", js: "userId", typ: "" },
-    ], false),
-    "JoinSessionResponse": o([
-        { json: "users", js: "users", typ: a(r("User")) },
-    ], false),
-    "User": o([
-        { json: "socketId", js: "socketId", typ: "" },
-        { json: "userId", js: "userId", typ: "" },
-    ], false),
-    "SongAddedEvent": o([
-        { json: "song", js: "song", typ: r("Song") },
-    ], false),
-    "VoteSongEvent": o([
-        { json: "songId", js: "songId", typ: "" },
-        { json: "vote", js: "vote", typ: 0 },
-    ], false),
-    "VoteSongRequest": o([
-        { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "songId", js: "songId", typ: "" },
-        { json: "vote", js: "vote", typ: 0 },
     ], false),
 };

@@ -149,6 +149,7 @@ const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
     const song: Song = {
         votes: 0,
         id: testSongId,
+        uri: 'testUri',
         title: 'testSongTitle',
         artist: 'testSongArtist',
         album: 'testSongAlbum',
