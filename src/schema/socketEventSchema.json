@@ -1,0 +1,66 @@
+{
+    "CreateSessionRequest": {
+        "hostId": "string",
+        "sessionName": "string"
+    },
+
+    "CreateSessionResponse": {
+        "sessionId": "string"
+    },
+    "JoinSessionRequest": {
+        "sessionId": "string",
+        "userId": "string"
+    },
+    "JoinSessionResponse": {
+        "users": [
+            {
+                "socketId": "string",
+                "userId": "string"
+            }
+        ]
+    },
+    "Song": {
+        "service": "string",
+        "id": "string",
+        "uri" : "string",
+        "title": "string",
+        "artist": "string",
+        "album": "string",
+        "votes": 0
+    },
+    "AddSongRequest": {
+        "sessionId": "string",
+        "song": {
+            "service": "string",
+            "id": "string",
+            "title": "string",
+            "artist": "string",
+            "album": "string",
+            "votes": 0
+        }
+    },
+    "SongAddedEvent": {
+        "song": {
+            "service": "string",
+            "id": "string",
+            "title": "string",
+            "artist": "string",
+            "album": "string",
+            "votes": 0
+        }
+    },
+    "VoteSongRequest": {
+        "sessionId": "string",
+        "songId": "string",
+        "vote": 0
+    },
+    "VoteSongEvent": {
+        "songId": "string",
+        "vote": 0
+    },
+    "ErrorResponse": {
+        "type": "string",
+        "message": "string",
+        "stack_trace": "string"
+    }
+}
