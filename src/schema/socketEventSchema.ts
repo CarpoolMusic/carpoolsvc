@@ -26,13 +26,14 @@ export interface AddSongRequest {
 }
 
 export interface Song {
-    service: string;
-    id:      string;
-    title:   string;
-    artist:  string;
-    album:   string;
-    votes:   number;
-    uri?:    string;
+    service:    string;
+    id:         string;
+    uri:        string;
+    title:      string;
+    artist:     string;
+    album:      string;
+    artworkUrl: string;
+    votes:      number;
 }
 
 export interface CreateSessionRequest {
@@ -263,11 +264,12 @@ const typeMap: any = {
     "Song": o([
         { json: "service", js: "service", typ: "" },
         { json: "id", js: "id", typ: "" },
+        { json: "uri", js: "uri", typ: "" },
         { json: "title", js: "title", typ: "" },
         { json: "artist", js: "artist", typ: "" },
         { json: "album", js: "album", typ: "" },
+        { json: "artworkUrl", js: "artworkUrl", typ: "" },
         { json: "votes", js: "votes", typ: 0 },
-        { json: "uri", js: "uri", typ: u(undefined, "") },
     ], false),
     "CreateSessionRequest": o([
         { json: "hostId", js: "hostId", typ: "" },

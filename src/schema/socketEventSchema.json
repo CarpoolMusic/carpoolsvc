@@ -26,6 +26,7 @@
         "title": "string",
         "artist": "string",
         "album": "string",
+        "artworkUrl": "string",
         "votes": 0
     },
     "AddSongRequest": {
@@ -33,9 +34,11 @@
         "song": {
             "service": "string",
             "id": "string",
+            "uri" : "string",
             "title": "string",
             "artist": "string",
             "album": "string",
+            "artworkUrl": "string",
             "votes": 0
         }
     },
@@ -43,9 +46,11 @@
         "song": {
             "service": "string",
             "id": "string",
+            "uri" : "string",
             "title": "string",
             "artist": "string",
             "album": "string",
+            "artworkUrl": "string",
             "votes": 0
         }
     },
