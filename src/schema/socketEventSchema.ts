@@ -15,6 +15,8 @@ export interface SocketEventSchema {
     Song:                  Song;
     AddSongRequest:        AddSongRequest;
     SongAddedEvent:        SongAddedEvent;
+    RemoveSongRequest:     RemoveSongRequest;
+    SongRemovedEvent:      SongRemovedEvent;
     VoteSongRequest:       VoteSongRequest;
     VoteSongEvent:         VoteSongEvent;
     ErrorResponse:         ErrorResponse;
@@ -65,8 +67,17 @@ export interface User {
     userId:   string;
 }
 
+export interface RemoveSongRequest {
+    sessionId: string;
+    songId:    string;
+}
+
 export interface SongAddedEvent {
     song: Song;
+}
+
+export interface SongRemovedEvent {
+    songId: string;
 }
 
 export interface VoteSongEvent {
@@ -253,6 +264,8 @@ const typeMap: any = {
         { json: "Song", js: "Song", typ: r("Song") },
         { json: "AddSongRequest", js: "AddSongRequest", typ: r("AddSongRequest") },
         { json: "SongAddedEvent", js: "SongAddedEvent", typ: r("SongAddedEvent") },
+        { json: "RemoveSongRequest", js: "RemoveSongRequest", typ: r("RemoveSongRequest") },
+        { json: "SongRemovedEvent", js: "SongRemovedEvent", typ: r("SongRemovedEvent") },
         { json: "VoteSongRequest", js: "VoteSongRequest", typ: r("VoteSongRequest") },
         { json: "VoteSongEvent", js: "VoteSongEvent", typ: r("VoteSongEvent") },
         { json: "ErrorResponse", js: "ErrorResponse", typ: r("ErrorResponse") },
@@ -294,8 +307,15 @@ const typeMap: any = {
         { json: "socketId", js: "socketId", typ: "" },
         { json: "userId", js: "userId", typ: "" },
     ], false),
+    "RemoveSongRequest": o([
+        { json: "sessionId", js: "sessionId", typ: "" },
+        { json: "songId", js: "songId", typ: "" },
+    ], false),
     "SongAddedEvent": o([
         { json: "song", js: "song", typ: r("Song") },
+    ], false),
+    "SongRemovedEvent": o([
+        { json: "songId", js: "songId", typ: "" },
     ], false),
     "VoteSongEvent": o([
         { json: "songId", js: "songId", typ: "" },

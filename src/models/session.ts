@@ -67,7 +67,7 @@ class Session {
     }
 
     public getNumVotes(songId: string) {
-        const song = this.queue.getQueue().find(song => song.id === songId);
+        const song = this.findSong(songId)
         return song ? song.votes : 0;
     }
 
@@ -77,6 +77,10 @@ class Session {
 
     public removeSong(songId: string): void {
         this.queue.removeSong(songId);
+    }
+
+    public findSong(songId: string): Song | undefined {
+        return this.queue.getQueue().find(song => song.id === songId);
     }
 
     public queueLength(): number {

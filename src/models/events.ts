@@ -9,6 +9,8 @@ export const EVENTS = {
     DISCONNECTED: 'disconnected',
     ADD_SONG: 'addSong',
     SONG_ADDED: 'songAdded',
+    REMOVE_SONG: 'removeSong',
+    SONG_REMOVED: 'songRemoved',
     VOTE_SONG: 'voteSong',
     SONG_VOTED: 'songVoted',
     ERROR: 'error',
