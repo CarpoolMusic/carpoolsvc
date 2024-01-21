@@ -3,7 +3,7 @@ import ioClient from 'socket.io-client';
 import { Server } from 'socket.io';
 import { SocketHandler } from '../src/services/socketHandler';
 import SessionManager from '../src/services/sessionManager';
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/schema/socketEventSchema';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/schema/socketEventSchema';
 import { EVENTS } from '../src/models/events';
 
 // Test configuration constants
@@ -30,6 +30,9 @@ let userJoinedResolve: (value: User) => void;
 
 let songAddedPromise: Promise<SongAddedEvent>;
 let songAddedResolve: (value: SongAddedEvent) => void;
+
+let songRemovedPromise: Promise<SongRemovedEvent>;
+let songRemovedResolve: (value: SongRemovedEvent) => void;
 
 let voteSongPromise: Promise<VoteSongEvent>;
 let voteSongResolve: (value: VoteSongEvent) => void;
@@ -80,6 +83,10 @@ const resetPromises = () => {
         songAddedResolve = resolve;
     });
 
+    songRemovedPromise = new Promise((resolve) => {
+        songRemovedResolve = resolve;
+    });
+
     voteSongPromise = new Promise((resolve) => {
         voteSongResolve = resolve;
     });
@@ -113,6 +120,17 @@ const setupGlobalListeners = (): void => {
     clientSocket.on(EVENTS.SONG_ADDED, (songAddedEvent: SongAddedEvent) => {
         if (songAddedResolve) {
             songAddedResolve(songAddedEvent);
+        }
+    });
+
+    otherClientSocket.on(EVENTS.SONG_REMOVED, (songRemovedEvent: SongRemovedEvent) => {
+        if (songRemovedResolve) {
+            songRemovedResolve(songRemovedEvent);
+        }
+    });
+    clientSocket.on(EVENTS.SONG_REMOVED, (songRemovedEvent: SongRemovedEvent) => {
+        if (songRemovedResolve) {
+            songRemovedResolve(songRemovedEvent);
         }
     });
 
@@ -188,6 +206,7 @@ export {
     joinSessionPromise,
     userJoinedPromise,
     songAddedPromise,
+    songRemovedPromise,
     voteSongPromise,
     clientSocket,
     otherClientSocket,

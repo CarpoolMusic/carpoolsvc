@@ -1,4 +1,4 @@
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, SongAddedEvent, VoteSongEvent, User, Song, VoteSongRequest} from '../../src/schema/socketEventSchema';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest} from '../../src/schema/socketEventSchema';
 import { EVENTS } from '../../src/models/events';
 import { SERVICE } from '../../src/models/services';
 
@@ -16,6 +16,7 @@ import {
     joinSessionPromise,
     userJoinedPromise,
     songAddedPromise,
+    songRemovedPromise,
     voteSongPromise,
     clientSocket,
     otherClientSocket,
@@ -25,6 +26,17 @@ import {
 import { serialize } from 'v8';
 
 let testSessionId: string;
+
+const testSong: Song = {
+    service: "Test service",
+    id: "Test ID",
+    uri: "Test URI",
+    title: "Test Song",
+    artist: "Test Artist",
+    album: "Test Album",
+    artworkUrl: "Test artwork url", 
+    votes: 0,
+};
 
 beforeAll((done) => {
     setupServerAndSockets()
@@ -103,17 +115,6 @@ describe('join session event', () => {
 
 describe('adding a song to session', () => {
 
-    const testSong: Song = {
-        service: "Test service",
-        id: "Test ID",
-        uri: "Test URI",
-        title: "Test Song",
-        artist: "Test Artist",
-        album: "Test Album",
-        artworkUrl: "Test artwork url", 
-        votes: 0,
-    };
-
     it("Should make the initial add song request", () => {
         // Build the add song request
         const addSongRequest: AddSongRequest = {
@@ -142,6 +143,32 @@ describe('adding a song to session', () => {
         expect(session?.viewLastSongAdded().id).toBe(testSong.id);
     });
 });
+
+describe('removing a song from the session', () => {
+
+    it("Should make the initial remove song request", () => {
+
+        const removeSongRequest: RemoveSongRequest = {
+            sessionId: testSessionId,
+            songId: testSong.id
+        };
+
+        clientSocket.emit(EVENTS.REMOVE_SONG, JSON.stringify(removeSongRequest));
+    });
+
+    it("Should remove song from queue for all users in session", async () => {
+        const songRemovedEvent: SongRemovedEvent = await songRemovedPromise;
+        const songId: string = songRemovedEvent.songId;
+
+        expect(songRemovedEvent).toBeDefined();
+        expect(songId).toBe(testSong.id);
+
+        const session = sessionManager.getSession(testSessionId);
+        // assert that the song was removedFrom the session
+        expect(session?.findSong(songId)).toBeUndefined();
+    });
+});
+
 
 describe('voting on a song', () => {
 

@@ -6,7 +6,7 @@
 import { create } from 'domain';
 import { Server, Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
-import { AddSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, Song, Convert } from "../schema/socketEventSchema";
+import { AddSongRequest, RemoveSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, SongRemovedEvent, Song, Convert } from "../schema/socketEventSchema";
 import SessionManager from './sessionManager';
 
 export class SocketHandler {
@@ -42,6 +42,16 @@ export class SocketHandler {
                 console.log("Add song request");
                 try {
                     this.handleAddSong(socket, JSON.parse(data.toString()));
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            // Listen for remove song event.
+            socket.on(EVENTS.REMOVE_SONG, (data: Buffer)=> {
+                console.log("Remove song request");
+                try {
+                    this.handleRemoveSong(socket, JSON.parse(data.toString()));
                 } catch (e) {
                     console.log(e);
                 }
@@ -130,6 +140,26 @@ export class SocketHandler {
         } else {
             // Build error response
             console.log("Could not find session to broadcast song added");
+        }
+    }
+
+    private handleRemoveSong(socket: Socket, removeSongRequest: RemoveSongRequest): void {
+        console.log("handleRemoveSong");
+
+        const sessionId = removeSongRequest.sessionId;
+        const songId: string = removeSongRequest.songId;
+        const session = this.sessionManager.getSession(sessionId);
+
+        if (session) {
+            session.removeSong(songId);
+            // Build the broadcast event
+            const songRemovedEvent: SongRemovedEvent = {
+                songId: songId
+            };
+            this.io.in(sessionId).emit(EVENTS.SONG_REMOVED, songRemovedEvent);
+        } else {
+            // Build error response
+            console.log("Could not find session to broadcast song removed");
         }
     }
 

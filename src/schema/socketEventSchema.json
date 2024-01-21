@@ -54,6 +54,13 @@
             "votes": 0
         }
     },
+    "RemoveSongRequest": {
+        "sessionId": "string",
+        "songId": "string"
+    },
+    "SongRemovedEvent": {
+        "songId": "string"
+    },
     "VoteSongRequest": {
         "sessionId": "string",
         "songId": "string",
