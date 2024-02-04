@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express'
 import { dataSource } from '../db/DataSource'
 import { User } from "../db/User/user";

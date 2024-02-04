@@ -28,8 +28,9 @@ export interface AddSongRequest {
 }
 
 export interface Song {
-    service:    string;
     id:         string;
+    appleID:    string;
+    spotifyID:  string;
     uri:        string;
     title:      string;
     artist:     string;
@@ -69,7 +70,7 @@ export interface User {
 
 export interface RemoveSongRequest {
     sessionId: string;
-    songId:    string;
+    id:        string;
 }
 
 export interface SongAddedEvent {
@@ -77,17 +78,17 @@ export interface SongAddedEvent {
 }
 
 export interface SongRemovedEvent {
-    songId: string;
+    id: string;
 }
 
 export interface VoteSongEvent {
-    songId: string;
-    vote:   number;
+    id:   string;
+    vote: number;
 }
 
 export interface VoteSongRequest {
     sessionId: string;
-    songId:    string;
+    id:        string;
     vote:      number;
 }
 
@@ -275,8 +276,9 @@ const typeMap: any = {
         { json: "song", js: "song", typ: r("Song") },
     ], false),
     "Song": o([
-        { json: "service", js: "service", typ: "" },
         { json: "id", js: "id", typ: "" },
+        { json: "appleID", js: "appleID", typ: "" },
+        { json: "spotifyID", js: "spotifyID", typ: "" },
         { json: "uri", js: "uri", typ: "" },
         { json: "title", js: "title", typ: "" },
         { json: "artist", js: "artist", typ: "" },
@@ -309,21 +311,21 @@ const typeMap: any = {
     ], false),
     "RemoveSongRequest": o([
         { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
     ], false),
     "SongAddedEvent": o([
         { json: "song", js: "song", typ: r("Song") },
     ], false),
     "SongRemovedEvent": o([
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
     ], false),
     "VoteSongEvent": o([
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
         { json: "vote", js: "vote", typ: 0 },
     ], false),
     "VoteSongRequest": o([
         { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
         { json: "vote", js: "vote", typ: 0 },
     ], false),
 };

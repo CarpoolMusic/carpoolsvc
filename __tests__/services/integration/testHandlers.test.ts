@@ -1,6 +1,5 @@
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest} from '../../src/schema/socketEventSchema';
-import { EVENTS } from '../../src/models/events';
-import { SERVICE } from '../../src/models/services';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest} from '../../../src/services/schema/socketEventSchema';
+import { EVENTS } from '../../../src/models/events';
 
 import {
     setupServerAndSockets,
@@ -22,14 +21,17 @@ import {
     otherClientSocket,
     sessionManager,
     addTestSongToTestSession
-} from '../setup';
-import { serialize } from 'v8';
+} from './setup';
+import { mockAppleSearch200 } from '../mocks/appleMocks';
+import { mockSpotifyGetToken } from '../mocks/spotifyMocks';
+import { mock } from 'fetch-mock';
 
 let testSessionId: string;
 
 const testSong: Song = {
-    service: "Test service",
     id: "Test ID",
+    appleID: "",
+    spotifyID: "Test Spotify ID",
     uri: "Test URI",
     title: "Test Song",
     artist: "Test Artist",
@@ -95,8 +97,8 @@ describe('join session event', () => {
 
     it("Host should be notified that new user has joined", async () => {
         const user: User = await userJoinedPromise;
-        // expect(user).toBeDefined();
-        // expect(user.userId).toBe(otherUserId);
+        expect(user.userId).toBeDefined();
+        expect(user.userId).toBe(otherUserId);
     });
 
     it("Should emit a session joined event", async () => {
@@ -121,6 +123,8 @@ describe('adding a song to session', () => {
             sessionId: testSessionId,
             song: testSong
         };
+        // mock call from song resolution
+        // mockAppleSearch200();
         // Make the add song request
         clientSocket.emit(EVENTS.ADD_SONG, JSON.stringify(addSongRequest));
     });
@@ -150,7 +154,7 @@ describe('removing a song from the session', () => {
 
         const removeSongRequest: RemoveSongRequest = {
             sessionId: testSessionId,
-            songId: testSong.id
+            id: testSong.id
         };
 
         clientSocket.emit(EVENTS.REMOVE_SONG, JSON.stringify(removeSongRequest));
@@ -158,7 +162,7 @@ describe('removing a song from the session', () => {
 
     it("Should remove song from queue for all users in session", async () => {
         const songRemovedEvent: SongRemovedEvent = await songRemovedPromise;
-        const songId: string = songRemovedEvent.songId;
+        const songId: string = songRemovedEvent.id;
 
         expect(songRemovedEvent).toBeDefined();
         expect(songId).toBe(testSong.id);
@@ -176,7 +180,7 @@ describe('voting on a song', () => {
         // Build the vote request
         const voteRequest: VoteSongRequest = {
             sessionId: testSessionId,
-            songId: testSongId,
+            id: testSongId,
             vote: 1
         };
         // Make the vote request
@@ -185,7 +189,7 @@ describe('voting on a song', () => {
 
     it("Should notify all users in session that a song has been voted on", async () => {
         const voteSongEvent: VoteSongEvent = await voteSongPromise;
-        const songId = voteSongEvent.songId;
+        const songId = voteSongEvent.id;
         const vote = voteSongEvent.vote;
 
         expect(songId).toBeDefined();
@@ -198,7 +202,7 @@ describe('voting on a song', () => {
         // Build the vote request
         const voteRequest: VoteSongRequest = {
             sessionId: testSessionId,
-            songId: testSongId,
+            id: testSongId,
             vote: -1
         };
         // Make the vote request
@@ -207,7 +211,7 @@ describe('voting on a song', () => {
 
     it("Should notify all users in session that a song has been voted on", async () => {
         const voteSongEvent: VoteSongEvent = await voteSongPromise;
-        const songId = voteSongEvent.songId;
+        const songId = voteSongEvent.id;
         const vote = voteSongEvent.vote;
 
         expect(songId).toBeDefined();

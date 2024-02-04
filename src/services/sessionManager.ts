@@ -5,7 +5,7 @@
  * This is managed in memory for now, but could be extended to use a database in the future.
  */
 import Session from '../models/session';
-import { User } from '../schema/socketEventSchema';
+import { User } from './schema/socketEventSchema';
 
 class SessionManager {
     private sessions: Map<string, Session>;

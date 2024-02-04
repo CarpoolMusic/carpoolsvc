@@ -4,7 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { User, Song } from '../schema/socketEventSchema';
+import { User, Song } from '../services/schema/socketEventSchema';
 import Queue from './queue';
 
 class Session {

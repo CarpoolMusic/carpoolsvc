@@ -6,16 +6,19 @@
 import { create } from 'domain';
 import { Server, Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
-import { AddSongRequest, RemoveSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, SongRemovedEvent, Song, Convert } from "../schema/socketEventSchema";
+import { AddSongRequest, RemoveSongRequest, CreateSessionRequest, CreateSessionResponse, ErrorResponse, JoinSessionRequest, JoinSessionResponse, User, VoteSongRequest, VoteSongEvent, SongAddedEvent, SongRemovedEvent, Song } from "./schema/socketEventSchema";
 import SessionManager from './sessionManager';
+import SongResolver from './songResolver';
 
 export class SocketHandler {
     private io: Server;
     private sessionManager: SessionManager;    
+    private songResolver: SongResolver;
 
     constructor(io: Server, sessionManager: SessionManager) {
         this.io = io;
         this.sessionManager = sessionManager;
+        this.songResolver = new SongResolver();
         this.initializeSocketEvents();
     }
 
@@ -72,7 +75,6 @@ export class SocketHandler {
     }
 
     private handleCreateSession(socket: Socket, createSessionRequest: CreateSessionRequest): void {
-
         const socketID: string = socket.id;
         const hostId = createSessionRequest.hostId;
         const sessionName = createSessionRequest.sessionName;
@@ -123,38 +125,43 @@ export class SocketHandler {
         }
     }
 
-    private handleAddSong(socket: Socket, addSongRequest: AddSongRequest): void {
+    private async handleAddSong(socket: Socket, addSongRequest: AddSongRequest): Promise<void> {
         console.log("handleAddSong");
 
         const sessionId = addSongRequest.sessionId;
         const song: Song = addSongRequest.song;
         const session = this.sessionManager.getSession(sessionId);
 
-        if (session) {
-            // Build the broadcast event
-            const songAddedEvent: SongAddedEvent = {
-                song: song
-            };
-            session.addSong(song);
-            this.io.in(sessionId).emit(EVENTS.SONG_ADDED, songAddedEvent);
-        } else {
-            // Build error response
-            console.log("Could not find session to broadcast song added");
-        }
+        await this.songResolver.resolveSong(song)
+            .then((resolvedSong) => {
+                console.log("Resolved all service IDs");
+                if (session) {
+                    const songAddedEvent: SongAddedEvent = {
+                        song: resolvedSong
+                    };
+                    session.addSong(resolvedSong);
+                    this.io.in(sessionId).emit(EVENTS.SONG_ADDED, songAddedEvent);
+                } else {
+                    console.log("Could not find session to broadcast song added");
+                }
+            })
+            .catch((error) => {
+                console.log("Error resolving service IDs", error);
+            });
     }
 
     private handleRemoveSong(socket: Socket, removeSongRequest: RemoveSongRequest): void {
         console.log("handleRemoveSong");
 
         const sessionId = removeSongRequest.sessionId;
-        const songId: string = removeSongRequest.songId;
+        const songId: string = removeSongRequest.id;
         const session = this.sessionManager.getSession(sessionId);
 
         if (session) {
             session.removeSong(songId);
             // Build the broadcast event
             const songRemovedEvent: SongRemovedEvent = {
-                songId: songId
+                id: songId
             };
             this.io.in(sessionId).emit(EVENTS.SONG_REMOVED, songRemovedEvent);
         } else {
@@ -164,21 +171,20 @@ export class SocketHandler {
     }
 
     private handleVoteSong(socket: Socket, voteSongRequest: VoteSongRequest): void {
-
         console.log("handleVoteSong");
 
         console.log(voteSongRequest);
         console.log(voteSongRequest.sessionId);
 
         const sessionId = voteSongRequest.sessionId;
-        const songId = voteSongRequest.songId;
+        const songId = voteSongRequest.id;
         const vote = voteSongRequest.vote;
         const session = this.sessionManager.getSession(sessionId);
 
         if (session) {
             session.voteOnSong(songId, vote);
             const voteSongEvent: VoteSongEvent = {
-                songId: songId,
+                id: songId,
                 vote: vote
             }
             this.io.in(sessionId).emit(EVENTS.SONG_VOTED, voteSongEvent);
