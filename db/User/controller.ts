@@ -1,17 +1,17 @@
 // user.controller.ts
-import { dataSource } from "../DataSource";
 import { UserRepository } from "./repository";
+import type { User } from './user.ts'
 
 class UserController {
 
     // Get all users from data source.
-    async users() {
+    async users(): Promise<User[]> {
         return await UserRepository.find();
     }
 
     // Get a user by ID
-    async user(id: number) {
-        return UserRepository.findOne(id);
+    async user(id: number): Promise<User | null> {
+        return await UserRepository.findOne({ where: { id } });
     }
 
 }

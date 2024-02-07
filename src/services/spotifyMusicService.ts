@@ -1,4 +1,4 @@
-import { Song } from './schema/socketEventSchema';
+import { type Song } from './schema/socketEventSchema';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -7,22 +7,19 @@ const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const BASE_URL = 'https://api.spotify.com';
 const SEARCH_URL = `${BASE_URL}/v1/search`;
 
-const client_id = '61c4e261fe3348b7baa6dbf27879f865';
-const client_secret = 'a3ca5c8fea4248cba3a15a4bfd6bda48';
+const CLIENT_ID = '61c4e261fe3348b7baa6dbf27879f865';
+const CLIENT_SECRET = 'a3ca5c8fea4248cba3a15a4bfd6bda48';
 
 class SpotifyMusicService {
     private accessToken: string = '';
-    private lastTokenFetchSeconds: number | null = null;
-
-    constructor() {
-    }
+    private readonly lastTokenFetchSeconds: number | null = null;
 
     public async init(): Promise<void> {
         this.accessToken = await this.requestToken();
     }
 
     public async requestToken(): Promise<string> {
-        if (this.lastTokenFetchSeconds) {
+        if (this.lastTokenFetchSeconds != null) {
             const secondsSinceLastFetch = (Date.now() - this.lastTokenFetchSeconds) / 1000;
             if (secondsSinceLastFetch < 3600) {
                 return this.accessToken;
@@ -36,7 +33,7 @@ class SpotifyMusicService {
                 }),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
+                    'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
                 },
             });
 
@@ -54,15 +51,15 @@ class SpotifyMusicService {
         }
     }
 
-    private buildQuery(song: Song) {
-        if (!song.title) {
+    private buildQuery(song: Song): string {
+        if (song.title === "") {
             throw new Error('Song must have a title');
         }
 
         const queryParts = [
             `${song.title} track:${song.title}`,
-            song.artist ? `artist:${song.artist}` : '',
-            song.album ? `album:${song.album}` : '',
+            (song.artist !== "") ? `artist:${song.artist}` : '',
+            (song.album !== "") ? `album:${song.album}` : '',
         ];
 
         const query = queryParts.filter(Boolean).join(' ');
@@ -88,17 +85,14 @@ class SpotifyMusicService {
             }
 
             const data = await response.json();
-            console.log(data);
 
-            // Assuming the first result is the desired one
-            // You might want to add more robust logic to ensure the correct song is selected
             const spotifyId = data.tracks.items[0].id;
 
             return spotifyId;
 
         } catch (error) {
             console.error('Error resolving song from Spotify:', error);
-            throw error; // or handle it as per your application's error handling policy
+            throw error;
         }
     }
 }

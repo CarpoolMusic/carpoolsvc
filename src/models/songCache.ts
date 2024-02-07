@@ -1,13 +1,13 @@
 class SongCache {
-    private cache: { [key: string]: string } = {};
-    
-    public add(key: string, value: string) {
+    private cache: Record<string, string> = {};
+
+    public add(key: string, value: string): void {
         this.cache[key] = value;
         this.cache[value] = key;
     }
-    
-    public get(key: string): string | undefined {
-        return this.cache[key];
+
+    public get(key: string): string {
+        return this.cache[key] ?? "";
     }
 }
 

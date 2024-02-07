@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
-dotenv.config();
 
+import http from 'http';
 import express from 'express'
 import { dataSource } from '../db/DataSource'
-import { User } from "../db/User/user";
 import { setupMiddleware } from "./middleware"
 import { SocketHandler } from "./services/socketHandler"
 import SessionManager from "./services/sessionManager"
+import { Server } from 'socket.io';
+dotenv.config();
 
 // Establish database connection.
 dataSource
@@ -14,7 +15,7 @@ dataSource
   .then(() => {
     console.log("Data source has been initialized");
   })
-  .catch((err) => {
+  .catch(() => {
     console.log("Error during Data Source initialization");
   })
 
@@ -24,12 +25,11 @@ app.use(express.json())
 const port = 3000;
 
 // Create a listener for socket connections
-const http = require('http');
-const socketIo = require('socket.io');
 const httpServer = http.createServer(app);
-const io = socketIo(httpServer);
+const io = new Server(httpServer); // Fix: Use the Server class to create the io instance
 const sessionManager: SessionManager = new SessionManager();
 const socketHandler: SocketHandler = new SocketHandler(io, sessionManager);
+console.log('SocketHandler', socketHandler);
 
 // Setup middleware.
 setupMiddleware(app);

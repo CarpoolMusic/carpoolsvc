@@ -5,10 +5,10 @@
  * This is managed in memory for now, but could be extended to use a database in the future.
  */
 import Session from '../models/session';
-import { User } from './schema/socketEventSchema';
+import { type User } from './schema/socketEventSchema';
 
 class SessionManager {
-    private sessions: Map<string, Session>;
+    private readonly sessions: Map<string, Session>;
 
     constructor() {
         this.sessions = new Map<string, Session>();
@@ -27,7 +27,7 @@ class SessionManager {
 
     public joinSession(sessionId: string, User: User): void {
         const session = this.sessions.get(sessionId);
-        if (session) {
+        if (session != null) {
             session.join(User);
         } else {
             throw new Error('Invalid session ID ( join session )');

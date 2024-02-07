@@ -1,22 +1,23 @@
-import { Song } from './schema/socketEventSchema';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+
+import { type Song } from './schema/socketEventSchema';
 
 import dotenv from 'dotenv';
 dotenv.config();
 
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
 
-const TEAM_ID = process.env.TEAM_ID || '';
-const KEY_ID = process.env.KEY_ID || '';
-const PATH_TO_PRIV_KEY = process.env.PATH_TO_APPLE_PRIV_KEY || 'keyNotFound';
+const TEAM_ID = (process.env.TEAM_ID ?? "");
+const KEY_ID = (process.env.KEY_ID ?? "");
+const PATH_TO_PRIV_KEY = (process.env.PATH_TO_APPLE_PRIV_KEY ?? "");
 
 const BASE_URL = 'https://api.music.apple.com/v1';
 
 class AppleMusicService {
 
-    private privateKey: string;
-    private token: string;
-    private lastTokenFetchSeconds: number | null = null;
+    private readonly privateKey: string;
+    private readonly token: string;
+    private readonly lastTokenFetchSeconds: number | null = null;
 
     constructor() {
         this.privateKey = fs.readFileSync(PATH_TO_PRIV_KEY, 'utf8');
@@ -27,7 +28,7 @@ class AppleMusicService {
     }
 
     private generateToken(): string {
-        if (this.lastTokenFetchSeconds) {
+        if (this.lastTokenFetchSeconds != null) {
             // check if token was fetched in last 180 days
             const secondsSinceLastFetch = (Date.now() - this.lastTokenFetchSeconds) / (1000 * 60 * 60 * 24);
             if (secondsSinceLastFetch < 180) {
@@ -48,17 +49,17 @@ class AppleMusicService {
         return token;
     }
 
-    private buildQuery(song: Song) {
-        if (!song.title) {
+    private buildQuery(song: Song): string {
+        if (song.title === "") {
             throw new Error('Song must have a title');
         }
 
         const queryParts = [
             song.title,
-            song.artist ? song.artist : '',
-            song.album ? song.album : '',
+            (song.artist !== "") ? song.artist : '',
+            (song.album !== "") ? song.album : '',
         ];
-        
+
         const query = queryParts.join(' ');
         return encodeURIComponent(query);
     }
@@ -67,7 +68,7 @@ class AppleMusicService {
         const searchUrl = `${BASE_URL}/catalog/${storefront}/search`;
         const query = this.buildQuery(song);
         const url = `${searchUrl}?term=${query}&types=songs&limit=1`;
- 
+
         try {
             const response = await fetch(url, {
                 method: 'GET',
