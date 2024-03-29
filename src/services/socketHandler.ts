@@ -6,17 +6,15 @@
 import { type Server, type Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
 import { type AddSongRequest, type RemoveSongRequest, type CreateSessionRequest, type CreateSessionResponse, type ErrorResponse, type JoinSessionRequest, type JoinSessionResponse, type User, type VoteSongRequest, type VoteSongEvent, type SongAddedEvent, type SongRemovedEvent, type Song } from "./schema/socketEventSchema";
-import type SessionManager from './sessionManager';
+import { sessionManager } from './sessionManager';
 import SongResolver from './songResolver';
 
 export class SocketHandler {
     private readonly io: Server;
-    private readonly sessionManager: SessionManager;
     private readonly songResolver: SongResolver;
 
-    constructor(io: Server, sessionManager: SessionManager) {
+    constructor(io: Server) {
         this.io = io;
-        this.sessionManager = sessionManager;
         this.songResolver = new SongResolver();
         this.initializeSocketEvents();
     }
@@ -80,7 +78,7 @@ export class SocketHandler {
         const hostId = createSessionRequest.hostId;
         const sessionName = createSessionRequest.sessionName;
         const user: User = { socketId: socketID, userId: hostId };
-        const sessionId: string = this.sessionManager.createSession(user, sessionName);
+        const sessionId: string = sessionManager.createSession(user, sessionName);
 
         // Join the user to the socket session room
         await socket.join(sessionId);
@@ -100,7 +98,7 @@ export class SocketHandler {
         try {
             const user: User = { socketId: socketID, userId: joinSessionRequest.userId }
             const sessionId = joinSessionRequest.sessionId;
-            this.sessionManager.joinSession(sessionId, user);
+            sessionManager.joinSession(sessionId, user);
 
             // Join the user to the socket session room
             await socket.join(sessionId);
@@ -110,7 +108,7 @@ export class SocketHandler {
 
             // Build the response
             const joinSessionResponse: JoinSessionResponse = {
-                users: ((this.sessionManager.getSession(sessionId)?.getUsers() ?? []))
+                users: ((sessionManager.getSession(sessionId)?.getUsers() ?? []))
             }
 
             // send the response
@@ -131,7 +129,7 @@ export class SocketHandler {
 
         const sessionId = addSongRequest.sessionId;
         const song: Song = addSongRequest.song;
-        const session = this.sessionManager.getSession(sessionId);
+        const session = sessionManager.getSession(sessionId);
 
         await this.songResolver.resolveSong(song)
             .then((resolvedSong) => {
@@ -156,7 +154,7 @@ export class SocketHandler {
 
         const sessionId = removeSongRequest.sessionId;
         const songId: string = removeSongRequest.id;
-        const session = this.sessionManager.getSession(sessionId);
+        const session = sessionManager.getSession(sessionId);
 
         if (session != null) {
             session.removeSong(songId);
@@ -180,7 +178,7 @@ export class SocketHandler {
         const sessionId = voteSongRequest.sessionId;
         const songId = voteSongRequest.id;
         const vote = voteSongRequest.vote;
-        const session = this.sessionManager.getSession(sessionId);
+        const session = sessionManager.getSession(sessionId);
 
         if (session != null) {
             session.voteOnSong(songId, vote);

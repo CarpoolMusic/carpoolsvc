@@ -14,8 +14,8 @@ class SessionManager {
         this.sessions = new Map<string, Session>();
     }
 
-    public createSession(host: User, sessionName: string): string {
-        const session = new Session(host, sessionName);
+    public createSession(user: User, sessionName: string): string {
+        const session = new Session(user, sessionName);
         const sessionId = session.getSessionId();
         this.sessions.set(sessionId, session);
         return sessionId;
@@ -39,4 +39,4 @@ class SessionManager {
     }
 }
 
-export default SessionManager;
+export const sessionManager = new SessionManager();

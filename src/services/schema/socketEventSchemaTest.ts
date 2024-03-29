@@ -14,7 +14,9 @@ export interface SocketEventSchemaTest {
     JoinSessionResponse:   JoinSessionResponse;
     Song:                  Song;
     AddSongRequest:        AddSongRequest;
-    AddSongResponse:       AddSongResponse;
+    SongAddedEvent:        SongAddedEvent;
+    RemoveSongRequest:     RemoveSongRequest;
+    SongRemovedEvent:      SongRemovedEvent;
     VoteSongRequest:       VoteSongRequest;
     VoteSongEvent:         VoteSongEvent;
     ErrorResponse:         ErrorResponse;
@@ -27,22 +29,19 @@ export interface AddSongRequest {
 
 export interface Song {
     id:         string;
+    appleID:    string;
+    spotifyID:  string;
+    uri:        string;
     title:      string;
     artist:     string;
     album:      string;
-    duration:   number;
-    uri:        string;
-    artworkURL: string;
-    artwork:    string;
+    artworkUrl: string;
     votes:      number;
-}
-
-export interface AddSongResponse {
-    song: Song;
 }
 
 export interface CreateSessionRequest {
     hostId:      string;
+    socketId:    string;
     sessionName: string;
 }
 
@@ -70,14 +69,27 @@ export interface User {
     userId:   string;
 }
 
+export interface RemoveSongRequest {
+    sessionId: string;
+    id:        string;
+}
+
+export interface SongAddedEvent {
+    song: Song;
+}
+
+export interface SongRemovedEvent {
+    id: string;
+}
+
 export interface VoteSongEvent {
-    songId: string;
-    vote:   number;
+    id:   string;
+    vote: number;
 }
 
 export interface VoteSongRequest {
     sessionId: string;
-    songId:    string;
+    id:        string;
     vote:      number;
 }
 
@@ -253,7 +265,9 @@ const typeMap: any = {
         { json: "JoinSessionResponse", js: "JoinSessionResponse", typ: r("JoinSessionResponse") },
         { json: "Song", js: "Song", typ: r("Song") },
         { json: "AddSongRequest", js: "AddSongRequest", typ: r("AddSongRequest") },
-        { json: "AddSongResponse", js: "AddSongResponse", typ: r("AddSongResponse") },
+        { json: "SongAddedEvent", js: "SongAddedEvent", typ: r("SongAddedEvent") },
+        { json: "RemoveSongRequest", js: "RemoveSongRequest", typ: r("RemoveSongRequest") },
+        { json: "SongRemovedEvent", js: "SongRemovedEvent", typ: r("SongRemovedEvent") },
         { json: "VoteSongRequest", js: "VoteSongRequest", typ: r("VoteSongRequest") },
         { json: "VoteSongEvent", js: "VoteSongEvent", typ: r("VoteSongEvent") },
         { json: "ErrorResponse", js: "ErrorResponse", typ: r("ErrorResponse") },
@@ -264,20 +278,18 @@ const typeMap: any = {
     ], false),
     "Song": o([
         { json: "id", js: "id", typ: "" },
+        { json: "appleID", js: "appleID", typ: "" },
+        { json: "spotifyID", js: "spotifyID", typ: "" },
+        { json: "uri", js: "uri", typ: "" },
         { json: "title", js: "title", typ: "" },
         { json: "artist", js: "artist", typ: "" },
         { json: "album", js: "album", typ: "" },
-        { json: "duration", js: "duration", typ: 0 },
-        { json: "uri", js: "uri", typ: "" },
-        { json: "artworkURL", js: "artworkURL", typ: "" },
-        { json: "artwork", js: "artwork", typ: "" },
+        { json: "artworkUrl", js: "artworkUrl", typ: "" },
         { json: "votes", js: "votes", typ: 0 },
-    ], false),
-    "AddSongResponse": o([
-        { json: "song", js: "song", typ: r("Song") },
     ], false),
     "CreateSessionRequest": o([
         { json: "hostId", js: "hostId", typ: "" },
+        { json: "socketId", js: "socketId", typ: "" },
         { json: "sessionName", js: "sessionName", typ: "" },
     ], false),
     "CreateSessionResponse": o([
@@ -299,13 +311,23 @@ const typeMap: any = {
         { json: "socketId", js: "socketId", typ: "" },
         { json: "userId", js: "userId", typ: "" },
     ], false),
+    "RemoveSongRequest": o([
+        { json: "sessionId", js: "sessionId", typ: "" },
+        { json: "id", js: "id", typ: "" },
+    ], false),
+    "SongAddedEvent": o([
+        { json: "song", js: "song", typ: r("Song") },
+    ], false),
+    "SongRemovedEvent": o([
+        { json: "id", js: "id", typ: "" },
+    ], false),
     "VoteSongEvent": o([
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
         { json: "vote", js: "vote", typ: 0 },
     ], false),
     "VoteSongRequest": o([
         { json: "sessionId", js: "sessionId", typ: "" },
-        { json: "songId", js: "songId", typ: "" },
+        { json: "id", js: "id", typ: "" },
         { json: "vote", js: "vote", typ: 0 },
     ], false),
 };

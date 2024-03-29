@@ -41,6 +41,7 @@ export interface Song {
 
 export interface CreateSessionRequest {
     hostId:      string;
+    socketId:    string;
     sessionName: string;
 }
 
@@ -288,6 +289,7 @@ const typeMap: any = {
     ], false),
     "CreateSessionRequest": o([
         { json: "hostId", js: "hostId", typ: "" },
+        { json: "socketId", js: "socketId", typ: "" },
         { json: "sessionName", js: "sessionName", typ: "" },
     ], false),
     "CreateSessionResponse": o([
