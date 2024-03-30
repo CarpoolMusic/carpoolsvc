@@ -4,15 +4,15 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { User, Song } from '../schema/socketEventSchema';
+import { type User, type Song } from '../services/schema/socketEventSchema';
 import Queue from './queue';
 
 class Session {
-    private hostSocketID: string;
-    private sessionId: string;
-    private sessionName: string;
-    private users: Map<string, string>;
-    private queue: Queue;
+    private readonly hostSocketID: string;
+    private readonly sessionId: string;
+    private readonly sessionName: string;
+    private readonly users: Map<string, string>;
+    private readonly queue: Queue;
 
     constructor(host: User, sessionName: string) {
         this.hostSocketID = host.socketId;
@@ -40,8 +40,8 @@ class Session {
     public isUser(socketId: string): boolean {
         return this.users.has(socketId);
     }
-    
-    public getUsers() : User[] {
+
+    public getUsers(): User[] {
         return Array.from(this.users).map(([socketId, userId]) => ({ socketId, userId }));
     }
 
@@ -66,9 +66,9 @@ class Session {
         return this.queue.peekTail();
     }
 
-    public getNumVotes(songId: string) {
+    public getNumVotes(songId: string): number {
         const song = this.findSong(songId)
-        return song ? song.votes : 0;
+        return (song != null) ? song.votes : 0;
     }
 
     public voteOnSong(songId: string, vote: number): void {

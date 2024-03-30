@@ -1,5 +1,5 @@
 // Queue implementation to hold songs
-import { Song } from "../schema/socketEventSchema";
+import { type Song } from "../services/schema/socketEventSchema";
 
 class Queue {
     private queue: Song[];
@@ -8,41 +8,41 @@ class Queue {
         this.queue = [];
     }
 
-    enqueue(song: Song) {
+    public enqueue(song: Song): void {
         this.queue.push(song);
     }
 
-    dequeue(): Song | undefined {
+    public dequeue(): Song | undefined {
         return this.queue.shift();
     }
 
-    peek(): Song {
+    public peek(): Song {
         return this.queue[0];
     }
 
-    peekTail(): Song {
+    public peekTail(): Song {
         return this.queue[this.queue.length - 1];
     }
 
-    getQueue(): Song[] {
+    public getQueue(): Song[] {
         return this.queue;
     }
 
-    getQueueLength(): number {
+    public getQueueLength(): number {
         return this.queue.length;
     }
 
-    getQueueIndex(songId: string): number {
+    public getQueueIndex(songId: string): number {
         return this.queue.findIndex(song => song.id === songId);
     }
 
-    removeSong(songId: string): void {
+    public removeSong(songId: string): void {
         this.queue = this.queue.filter(song => song.id !== songId);
     }
 
-    voteOnSong(songId: string, vote: number): void {
+    public voteOnSong(songId: string, vote: number): void {
         const song = this.queue.find(song => song.id === songId);
-        if (song) {
+        if (song != null) {
             song.votes += vote;
         }
     }

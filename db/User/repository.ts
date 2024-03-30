@@ -6,17 +6,17 @@ export const UserRepository = dataSource.getRepository(User).extend({
     // Add custom methods here.
 
     // Get a user by username
-    findByUsername(username: string) {
-        return this.createQueryBuilder("user")
-        .where("user.username = :username", { username })
-        .getOne()
+    async findByUsername(username: string) {
+        return await this.createQueryBuilder("user")
+            .where("user.username = :username", { username })
+            .getOne()
     },
 
     // Get a user by email
-    findByEmail(email: string) {
-        return this.createQueryBuilder("user")
-        .where("user.email = :email", { email })
-        .getOne()
+    async findByEmail(email: string) {
+        return await this.createQueryBuilder("user")
+            .where("user.email = :email", { email })
+            .getOne()
     }
 
 });

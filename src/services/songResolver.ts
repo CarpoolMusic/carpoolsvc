@@ -1,29 +1,49 @@
-import { SERVICE } from '../../src/models/services';
-import { Song } from '../../src/schema/socketEventSchema';
+import SpotifyMusicService from './spotifyMusicService';
+import AppleMusicService from './appleMusicService';
+import SongCache from '../models/songCache';
+import { type Song } from './schema/socketEventSchema';
 
 class SongResolver {
+    private readonly spotifyMusicService: SpotifyMusicService;
+    private readonly appleMusicService: AppleMusicService;
+    private readonly songCache: SongCache;
 
-    // Takes a song object and returns the ID for the users corresponding music service type (appleMusic, spotify, etc).
+    constructor() {
+        this.appleMusicService = new AppleMusicService();
+        this.spotifyMusicService = new SpotifyMusicService();
+        this.songCache = new SongCache();
+    }
 
-    async resolveSong(song: Song, serviceType: string) {
-        switch(serviceType) {
-            case SERVICE.apple:
-                return await this.resolveFromAppleMusic(song);
-            case SERVICE.spotify:
-                return await this.resolveFromSpotify(song);
-            default:
-                throw new Error("Invalid service type");
+    public async resolveSong(song: Song): Promise<Song> {
+        const resolvedSong = song;
+
+        // needs async for token retrieval
+        await this.spotifyMusicService.init();
+
+        if ((song.appleID !== "") && (song.spotifyID !== "")) {
+            throw new Error("Song cannot have both an appleID and a spotifyID");
         }
+        if ((song.appleID === "") && (song.spotifyID === "")) {
+            throw new Error("Song must have either an appleID or a spotifyID");
+        }
+
+        if (song.appleID === "") {
+            let appleID = this.songCache.get(song.spotifyID);
+            if (appleID === "") {
+                appleID = await this.appleMusicService.resolveFromAppleMusic(song, 'us');
+                resolvedSong.appleID = appleID;
+                this.songCache.add(song.spotifyID, appleID);
+            }
+        } else if (song.spotifyID === "") {
+            let spotifyID = this.songCache.get(song.appleID);
+            if (spotifyID === "") {
+                spotifyID = await this.spotifyMusicService.resolveFromSpotify(song, 'us');
+                resolvedSong.spotifyID = spotifyID;
+                this.songCache.add(song.appleID, spotifyID);
+            }
+        }
+
+        return resolvedSong;
     }
-
-    private async resolveFromAppleMusic(song: Song) {
-        // Use spotify API to resolve song ID
-        
-
-    }
-
-    private async resolveFromSpotify(song: Song) {
-    }
-
-
 }
+export default SongResolver;

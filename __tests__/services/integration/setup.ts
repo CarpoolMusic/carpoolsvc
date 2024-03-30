@@ -1,10 +1,12 @@
 import { createServer } from 'http';
 import ioClient from 'socket.io-client';
 import { Server } from 'socket.io';
-import { SocketHandler } from '../src/services/socketHandler';
-import SessionManager from '../src/services/sessionManager';
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/schema/socketEventSchema';
-import { EVENTS } from '../src/models/events';
+import { SocketHandler } from '../../../src/services/socketHandler';
+import SessionManager from '../../../src/services/sessionManager';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../../../src/services/schema/socketEventSchema';
+import { EVENTS } from '../../../src/models/events';
+import { mockSpotifySearch200, mockSpotifyGetToken} from '../mocks/spotifyMocks';
+import { mockAppleSearch200 } from '../mocks/appleMocks';
 
 // Test configuration constants
 const testUserId = 'testUserId';
@@ -40,6 +42,13 @@ let voteSongResolve: (value: VoteSongEvent) => void;
 // Utility functions for setup and assertions
 const setupServerAndSockets = (): Promise<void> => {
     return new Promise((resolve, reject) => {
+        // setup mocks for resolver 
+        // add song will attempt to resolve with music service
+        mockSpotifyGetToken();
+        mockSpotifySearch200();
+
+        mockAppleSearch200();
+
         const httpServer = createServer().listen(3200);
         ioServer = new Server(httpServer);
         sessionManager = new SessionManager();
@@ -167,12 +176,13 @@ const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
     const song: Song = {
         votes: 0,
         id: testSongId,
+        appleID: '',
+        spotifyID: 'testSpotifyID',
         uri: 'testUri',
-        title: 'testSongTitle',
-        artist: 'testSongArtist',
-        album: 'testSongAlbum',
+        title: 'Test Song',
+        artist: 'Test Artist',
+        album: 'Test Album',
         artworkUrl: 'testArtworkUrl',
-        service: 'testService',
     }
     const addSongRequest: AddSongRequest = {
         sessionId: testSessionId,

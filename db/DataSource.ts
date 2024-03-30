@@ -1,12 +1,12 @@
 import "reflect-metadata"
 
 import { DataSource } from "typeorm"
-import { User} from "./User/user"
+import { User } from "./User/user"
 
 // Connect to postgres db in docker container.
 const dataSource = new DataSource({
     type: "postgres",
-    host: process.env.DATABASE_HOST || "localhost",
+    host: process.env.DATABASE_HOST ?? "localhost",
     port: 5432,
     username: "root",
     password: "jam",
