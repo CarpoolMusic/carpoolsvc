@@ -1,5 +1,5 @@
-import SpotifyMusicService from '/Users/nolb/dev/proj/carpoolsvc/src/services/spotifyMusicService';
-import { Song } from '/Users/nolb/dev/proj/carpoolsvc/src/services/schema/socketEventSchema';
+import SpotifyMusicService from '../../../src/services/spotifyMusicService';
+import { Song } from '../../../src/services/schema/socketEventSchema';
 
 const song: Song = {
     id: '',
@@ -33,11 +33,11 @@ describe('SpotifyMusicService', () => {
         expect(resolvedId).toBe(song.spotifyID);
     });
 
-    it ('should throw when searching for non existent song', async () => {
+    it('should throw when searching for non existent song', async () => {
         await service.init();
         song.title = 'ThisSongDoesNotExist';
         await expect(service.resolveFromSpotify(song, market)).rejects.toThrow();
-        });
+    });
 
     it('should throw an error when Spotify API responds with non-200 status', async () => {
         await service.init();

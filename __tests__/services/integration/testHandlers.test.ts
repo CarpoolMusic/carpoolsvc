@@ -1,4 +1,4 @@
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest} from '../../../src/services/schema/socketEventSchema';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest } from '../../../src/services/schema/socketEventSchema';
 import { EVENTS } from '../../../src/models/events';
 
 import {
@@ -36,14 +36,14 @@ const testSong: Song = {
     title: "Test Song",
     artist: "Test Artist",
     album: "Test Album",
-    artworkUrl: "Test artwork url", 
+    artworkUrl: "Test artwork url",
     votes: 0,
 };
 
 beforeAll((done) => {
     setupServerAndSockets()
         .then(() => createTestSession(testUserId, testSessionName)
-        .then((sessionId) => testSessionId = sessionId))
+            .then((sessionId) => testSessionId = sessionId))
         .then(() => addTestSongToTestSession(testSessionId))
         .then(() => done());
 
@@ -67,7 +67,8 @@ describe('create session event', () => {
         // Build the create session request
         const createSessionRequest: CreateSessionRequest = {
             hostId: testUserId,
-            sessionName: testSessionName
+            sessionName: testSessionName,
+            socketId: ''
         };
 
         // Emit the create session event from the client socket.
@@ -196,7 +197,7 @@ describe('voting on a song', () => {
         expect(songId).toBe(testSongId);
         expect(vote).toBeDefined();
         expect(sessionManager.getSession(testSessionId)?.getNumVotes(testSongId)).toBe(1);
-    }); 
+    });
 
     it("Should make the initial vote request to downvote", () => {
         // Build the vote request
@@ -218,5 +219,5 @@ describe('voting on a song', () => {
         expect(songId).toBe(testSongId);
         expect(vote).toBeDefined();
         expect(sessionManager.getSession(testSessionId)?.getNumVotes(testSongId)).toBe(0);
-    }); 
+    });
 });

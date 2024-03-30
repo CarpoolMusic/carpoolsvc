@@ -11,7 +11,7 @@ const song: Song = {
     id: '123',
     appleID: '',
     spotifyID: 'spotify123',
-    title: 'Test Song', 
+    title: 'Test Song',
     artist: 'Test Artist',
     uri: '',
     album: 'Test Album',
