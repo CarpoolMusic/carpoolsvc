@@ -1,0 +1,4 @@
+/src/services/schema
+node_modules
+*.config.ts
+__tests__

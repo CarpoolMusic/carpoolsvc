@@ -1,6 +1,6 @@
 import fetchMock, { mock } from 'fetch-mock';
-import SpotifyMusicService from '/Users/nolb/dev/proj/carpoolsvc/src/services/spotifyMusicService';
-import { Song } from '/Users/nolb/dev/proj/carpoolsvc/src/services/schema/socketEventSchema';
+import SpotifyMusicService from '../../../src/services/spotifyMusicService';
+import { Song } from '../../../src/services/schema/socketEventSchema';
 import { mockSpotifyGetToken, mockSpotifySearch200 } from '../mocks/spotifyMocks';
 
 const song: Song = {

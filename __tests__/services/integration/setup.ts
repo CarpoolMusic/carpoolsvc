@@ -2,10 +2,10 @@ import { createServer } from 'http';
 import ioClient from 'socket.io-client';
 import { Server } from 'socket.io';
 import { SocketHandler } from '../../../src/services/socketHandler';
-import SessionManager from '../../../src/services/sessionManager';
+import { sessionManager } from '../../../src/services/sessionManager';
 import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../../../src/services/schema/socketEventSchema';
 import { EVENTS } from '../../../src/models/events';
-import { mockSpotifySearch200, mockSpotifyGetToken} from '../mocks/spotifyMocks';
+import { mockSpotifySearch200, mockSpotifyGetToken } from '../mocks/spotifyMocks';
 import { mockAppleSearch200 } from '../mocks/appleMocks';
 
 // Test configuration constants
@@ -18,7 +18,6 @@ const testSongId = 'testSongId';
 let ioServer: Server;
 let clientSocket: any;
 let otherClientSocket: any;
-let sessionManager: SessionManager;
 let socketHandler: SocketHandler;
 
 // Promises for global listeners
@@ -51,8 +50,7 @@ const setupServerAndSockets = (): Promise<void> => {
 
         const httpServer = createServer().listen(3200);
         ioServer = new Server(httpServer);
-        sessionManager = new SessionManager();
-        socketHandler = new SocketHandler(ioServer, sessionManager);
+        socketHandler = new SocketHandler(ioServer);
 
         clientSocket = ioClient('http://localhost:3200');
         otherClientSocket = ioClient('http://localhost:3200');
@@ -85,7 +83,7 @@ const resetPromises = () => {
     });
 
     userJoinedPromise = new Promise((resolve) => {
-        userJoinedResolve = resolve; 
+        userJoinedResolve = resolve;
     });
 
     songAddedPromise = new Promise((resolve) => {
@@ -111,13 +109,13 @@ const setupGlobalListeners = (): void => {
 
     otherClientSocket.on(EVENTS.SESSION_JOINED, (joinSessionResponse: JoinSessionResponse) => {
         if (joinSessionResponse) {
-            joinSessionResolve(joinSessionResponse); 
+            joinSessionResolve(joinSessionResponse);
         }
     });
 
     clientSocket.on(EVENTS.USER_JOINED, (user: User) => {
         if (userJoinedResolve) {
-            userJoinedResolve(user); 
+            userJoinedResolve(user);
         }
     });
 
@@ -155,12 +153,15 @@ const setupGlobalListeners = (): void => {
 const closeConnections = (): void => {
     ioServer.close();
     clientSocket.close();
-    otherClientSocket.close(); 
+    otherClientSocket.close();
 }
 
 const createTestSession = (userId: string, sessionName: string): Promise<string> => {
     let testSessionId: string;
-    const createSessionRequest: CreateSessionRequest = { hostId: userId, sessionName: sessionName };
+    const createSessionRequest: CreateSessionRequest = {
+        hostId: userId, sessionName: sessionName,
+        socketId: ''
+    };
 
     // Create the session
     clientSocket.emit(EVENTS.CREATE_SESSION, JSON.stringify(createSessionRequest));
@@ -172,7 +173,7 @@ const createTestSession = (userId: string, sessionName: string): Promise<string>
 };
 
 const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
-    console.log("TEST SESSION ID ",  testSessionId);
+    console.log("TEST SESSION ID ", testSessionId);
     const song: Song = {
         votes: 0,
         id: testSongId,
