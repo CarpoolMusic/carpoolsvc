@@ -22,9 +22,6 @@ class AppleMusicService {
     constructor() {
         this.privateKey = fs.readFileSync(PATH_TO_PRIV_KEY, 'utf8');
         this.token = this.generateToken();
-        console.log(this.token);
-        console.log('TEAM_ID', TEAM_ID);
-        console.log('KEY_ID', KEY_ID);
     }
 
     private generateToken(): string {

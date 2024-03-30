@@ -1,12 +1,12 @@
 import fetchMock from 'fetch-mock';
-import { Song } from '../../../src/services/schema/socketEventSchema';
+import { Song } from '../../src/services/schema/socketEventSchema';
 
 const storefront = 'us';
 const song: Song = {
     id: '123',
     appleID: '123',
     spotifyID: 'spotify123',
-    title: 'Test Song', 
+    title: 'Test Song',
     artist: 'Test Artist',
     uri: '',
     album: 'Test Album',
