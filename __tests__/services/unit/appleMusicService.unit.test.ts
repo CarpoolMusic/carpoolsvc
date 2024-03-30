@@ -4,7 +4,7 @@ dotenv.config();
 import fetchMock, { mock } from 'fetch-mock'; // Import fetch-mock
 import AppleMusicService from '../../../src/services/appleMusicService';
 import { Song } from '../../../src/services/schema/socketEventSchema';
-import { mockAppleSearch200, mockAppleSearch500 } from '../mocks/appleMocks';
+import { mockAppleSearch200, mockAppleSearch500 } from '../../mocks/appleMocks';
 
 const storefront = 'us';
 const song: Song = {

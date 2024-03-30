@@ -21,10 +21,7 @@ import {
     otherClientSocket,
     sessionManager,
     addTestSongToTestSession
-} from './setup';
-import { mockAppleSearch200 } from '../mocks/appleMocks';
-import { mockSpotifyGetToken } from '../mocks/spotifyMocks';
-import { mock } from 'fetch-mock';
+} from '../../setup';
 
 let testSessionId: string;
 

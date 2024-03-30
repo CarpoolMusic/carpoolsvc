@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose --coverage",
+    "test": "jest --verbose --coverage __tests__/services/*",
     "utest": "jest --verbose --coverage __tests__/services/unit/*.test.ts",
     "itest": "jest --verbose --coverage __tests__/services/integration/*.test.ts",
     "start": "ts-node src/index.ts",
