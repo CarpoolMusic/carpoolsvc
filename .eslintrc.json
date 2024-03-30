@@ -1,0 +1,21 @@
+{
+    "env": {
+        "es2021": true
+    },
+    "extends": [
+        "standard-with-typescript",
+        "prettier",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "project": "./tsconfig.json" // Ensure you specify the path to your tsconfig.json
+    },
+    "rules": {
+        // You can override or specify additional rules here
+    },
+    "plugins": [
+        "prettier"
+    ]
+}
