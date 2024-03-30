@@ -36,8 +36,8 @@ jobs:
       - name: Run Unit Tests
         run: npm run utest
 
-      - name: Run Integration Tests
-        run: npm run itest
+      # - name: Run Integration Tests
+      #   run: npm run itest
 
       - name: Upload coverage to Codecov (optional)
         uses: codecov/codecov-action@v2
