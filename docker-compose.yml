@@ -2,15 +2,16 @@ version: '3'
 
 services:
   app:
-    volumes:
-      - /Users/nolb/dev/proj/carpool/carpoolsvc:/workspaces
     build: .
+    volumes:
+      - /Users/nolb/carpool/carpoolsvc:/workspaces
     ports:
       - "3000:3000"
     depends_on:
       - db
     environment:
-      - DATABASE_HOST=db
+      - DATABASE_URL=postgres://root:jam@db:5432/carpooldb
+    command: sh -c "npm run migrate:latest && npm start"
 
   db:
     image: "postgres:16"
