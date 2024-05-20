@@ -7,6 +7,9 @@ WORKDIR /workspaces
 # Install TypeScript globally
 RUN npm install -g typescript
 
+# Install ts-node globally
+RUN npm install -g ts-node
+
 # Copy package.json and package-lock.json for installing dependencies
 COPY package*.json ./
 
@@ -21,6 +24,8 @@ RUN tsc
 
 # Expose port (you can use any port you like)
 EXPOSE 3000
+
+RUN npm run build
 
 # Run the application
 CMD ["npm", "start"]
