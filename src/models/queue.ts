@@ -1,5 +1,5 @@
 // Queue implementation to hold songs
-import { type Song } from "../services/schema/socketEventSchema";
+import { type Song } from "../schema/socketEventSchema";
 
 class Queue {
     private queue: Song[];

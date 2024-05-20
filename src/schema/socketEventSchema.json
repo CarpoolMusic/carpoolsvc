@@ -1,9 +1,12 @@
 {
+    "LoginRequest": {
+        "username": "string",
+        "password": "string"
+    },
     "CreateSessionRequest": {
         "hostId": "string",
         "sessionName": "string"
     },
-
     "CreateSessionResponse": {
         "sessionId": "string"
     },
@@ -23,7 +26,7 @@
         "id": "string",
         "appleID": "string",
         "spotifyID": "string",
-        "uri" : "string",
+        "uri": "string",
         "title": "string",
         "artist": "string",
         "album": "string",
@@ -36,7 +39,7 @@
             "id": "string",
             "appleID": "string",
             "spotifyID": "string",
-            "uri" : "string",
+            "uri": "string",
             "title": "string",
             "artist": "string",
             "album": "string",
@@ -49,7 +52,7 @@
             "id": "string",
             "appleID": "string",
             "spotifyID": "string",
-            "uri" : "string",
+            "uri": "string",
             "title": "string",
             "artist": "string",
             "album": "string",

@@ -3,7 +3,7 @@ import ioClient from 'socket.io-client';
 import { Server } from 'socket.io';
 import { SocketHandler } from '../src/services/socketHandler';
 import { sessionManager } from '../src/services/sessionManager';
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/services/schema/socketEventSchema';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, AddSongRequest } from '../src/schema/socketEventSchema';
 import { EVENTS } from '../src/models/events';
 import { mockSpotifySearch200, mockSpotifyGetToken } from './mocks/spotifyMocks';
 import { mockAppleSearch200 } from './mocks/appleMocks';

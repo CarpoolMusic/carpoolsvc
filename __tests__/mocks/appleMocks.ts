@@ -1,5 +1,5 @@
 import fetchMock from 'fetch-mock';
-import { Song } from '../../src/services/schema/socketEventSchema';
+import { Song } from '../../src/schema/socketEventSchema';
 
 const storefront = 'us';
 const song: Song = {

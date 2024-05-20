@@ -5,7 +5,7 @@
  */
 import { type Server, type Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
-import { type AddSongRequest, type RemoveSongRequest, type CreateSessionRequest, type CreateSessionResponse, type ErrorResponse, type JoinSessionRequest, type JoinSessionResponse, type User, type VoteSongRequest, type VoteSongEvent, type SongAddedEvent, type SongRemovedEvent, type Song } from "./schema/socketEventSchema";
+import { type AddSongRequest, type RemoveSongRequest, type CreateSessionRequest, type CreateSessionResponse, type ErrorResponse, type JoinSessionRequest, type JoinSessionResponse, type User, type VoteSongRequest, type VoteSongEvent, type SongAddedEvent, type SongRemovedEvent, type Song } from "../schema/socketEventSchema";
 import { sessionManager } from './sessionManager';
 import SongResolver from './songResolver';
 
@@ -32,20 +32,28 @@ export class SocketHandler {
             });
 
             // Listen for join session event
-            socket.on(EVENTS.JOIN_SESSION, async (data: Buffer) => {
-                console.log("joinSessionRequest");
-                const joinSessionRequest: JoinSessionRequest = JSON.parse(data.toString());
-                await this.handleJoinSession(socket, joinSessionRequest);
+            socket.on(EVENTS.JOIN_SESSION, async (data: JoinSessionRequest, ack) => {
+                console.log("joinSessionRequest", data);
+                const joinSessionRequest: JoinSessionRequest = data;
+                await this.handleJoinSession(socket, joinSessionRequest).then(() => {
+                    ack({ status: 'success' });
+                }).catch((error) => {
+                    console.log("Error joining session", error)
+                    ack({ status: 'error', message: "Failed to join session with error" });
+                });
             });
 
             // Listen for add song event.
-            socket.on(EVENTS.ADD_SONG, async (data: Buffer) => {
+            socket.on(EVENTS.ADD_SONG, async (data: AddSongRequest, ack) => {
                 console.log("Add song request");
-                try {
-                    await this.handleAddSong(socket, JSON.parse(data.toString()) as AddSongRequest);
-                } catch (e) {
-                    console.log(e);
-                }
+                const addSongRequest: AddSongRequest = data;
+
+                await this.handleAddSong(socket, addSongRequest).then(() => {
+                    ack({ status: 'success' });
+                }).catch((error) => {
+                    console.log("Error adding song to session", error)
+                    ack({ status: 'error', message: "Failed to add song to session with error" });
+                });
             });
 
             // Listen for remove song event.
@@ -127,26 +135,23 @@ export class SocketHandler {
     private async handleAddSong(socket: Socket, addSongRequest: AddSongRequest): Promise<void> {
         console.log("handleAddSong");
 
+        console.log('addSongRequest', addSongRequest);
         const sessionId = addSongRequest.sessionId;
         const song: Song = addSongRequest.song;
         const session = sessionManager.getSession(sessionId);
 
-        await this.songResolver.resolveSong(song)
-            .then((resolvedSong) => {
-                console.log("Resolved all service IDs");
-                if (session != null) {
-                    const songAddedEvent: SongAddedEvent = {
-                        song: resolvedSong
-                    };
-                    session.addSong(resolvedSong);
-                    this.io.in(sessionId).emit(EVENTS.SONG_ADDED, songAddedEvent);
-                } else {
-                    console.log("Could not find session to broadcast song added");
-                }
-            })
-            .catch((error) => {
-                console.log("Error resolving service IDs", error);
-            });
+        const songAddedEvent: SongAddedEvent = {
+            song: song
+        }
+
+        // attempt to resolve song by using some sort of DB lookup.
+
+        if (session != null) {
+            session.addSong(song);
+            this.io.in(sessionId).emit(EVENTS.SONG_ADDED, songAddedEvent);
+        } else {
+            console.log("Could not find session to broadcast song added");
+        }
     }
 
     private handleRemoveSong(socket: Socket, removeSongRequest: RemoveSongRequest): void {

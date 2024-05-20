@@ -1,4 +1,4 @@
-import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest } from '../../../src/services/schema/socketEventSchema';
+import { CreateSessionRequest, CreateSessionResponse, JoinSessionRequest, JoinSessionResponse, AddSongRequest, RemoveSongRequest, SongAddedEvent, SongRemovedEvent, VoteSongEvent, User, Song, VoteSongRequest } from '../../../src/schema/socketEventSchema';
 import { EVENTS } from '../../../src/models/events';
 
 import {

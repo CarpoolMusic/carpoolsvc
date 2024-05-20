@@ -1,4 +1,4 @@
-import { type Song } from './schema/socketEventSchema';
+import { type Song } from '../schema/socketEventSchema';
 
 import dotenv from 'dotenv';
 dotenv.config();
