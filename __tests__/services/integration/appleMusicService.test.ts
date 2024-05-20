@@ -2,14 +2,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import AppleMusicService from '../../../src/services/appleMusicService';
-import { Song } from '../../../src/services/schema/socketEventSchema';
+import { Song } from '../../../src/schema/socketEventSchema';
 
 const storefront = 'us';
 const song: Song = {
     id: '1584281771',
     appleID: '',
     spotifyID: 'spotify123',
-    title: 'TSU', 
+    title: 'TSU',
     artist: 'Drake',
     uri: '',
     album: '',
@@ -29,7 +29,7 @@ describe('AppleMusicService', () => {
         expect(id).toBe(song.id);
     });
 
-    it ('should throw when searching for non existent song', async () => {
+    it('should throw when searching for non existent song', async () => {
         song.title = 'ThisSongDoesNotExist';
         await expect(service.resolveFromAppleMusic(song, storefront)).rejects.toThrow();
     });
