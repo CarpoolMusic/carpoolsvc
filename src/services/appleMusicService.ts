@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 
-import { type Song } from './schema/socketEventSchema';
+import { type Song } from '../schema/socketEventSchema';
 
 import dotenv from 'dotenv';
 dotenv.config();

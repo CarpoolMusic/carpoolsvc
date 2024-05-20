@@ -103,7 +103,7 @@
   "include": [
     "src/**/*.ts",
     "db/**/*.ts",
-    "migrations/**/*.ts",
+    "db/schema/migrations/**/*.ts",
     "./knexfile.ts"
   ],
   "exclude": [
