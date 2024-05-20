@@ -4,7 +4,13 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    branches: 
+      - main
 
 jobs:
   test-and-lint:
@@ -38,6 +44,9 @@ jobs:
 
       # - name: Run Integration Tests
       #   run: npm run itest
+
+      - name: Run Database Tests
+        run: npm run dbtest
 
       - name: Upload coverage to Codecov (optional)
         uses: codecov/codecov-action@v2
