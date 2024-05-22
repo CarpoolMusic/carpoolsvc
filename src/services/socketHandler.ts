@@ -7,15 +7,12 @@ import { type Server, type Socket } from 'socket.io';
 import { EVENTS } from '../models/events';
 import { type AddSongRequest, type RemoveSongRequest, type CreateSessionRequest, type CreateSessionResponse, type ErrorResponse, type JoinSessionRequest, type JoinSessionResponse, type User, type VoteSongRequest, type VoteSongEvent, type SongAddedEvent, type SongRemovedEvent, type Song } from "../schema/socketEventSchema";
 import { sessionManager } from './sessionManager';
-import SongResolver from './songResolver';
 
 export class SocketHandler {
     private readonly io: Server;
-    private readonly songResolver: SongResolver;
 
     constructor(io: Server) {
         this.io = io;
-        this.songResolver = new SongResolver();
         this.initializeSocketEvents();
     }
 
@@ -32,7 +29,7 @@ export class SocketHandler {
             });
 
             // Listen for join session event
-            socket.on(EVENTS.JOIN_SESSION, async (data: JoinSessionRequest, ack) => {
+            socket.on(EVENTS.JOIN_SESSION, async (data: JoinSessionRequest, ack: (arg0: { status: string; message?: string; }) => void) => {
                 console.log("joinSessionRequest", data);
                 const joinSessionRequest: JoinSessionRequest = data;
                 await this.handleJoinSession(socket, joinSessionRequest).then(() => {
@@ -44,7 +41,7 @@ export class SocketHandler {
             });
 
             // Listen for add song event.
-            socket.on(EVENTS.ADD_SONG, async (data: AddSongRequest, ack) => {
+            socket.on(EVENTS.ADD_SONG, async (data: AddSongRequest, ack: (arg0: { status: string; message?: string; }) => void) => {
                 console.log("Add song request");
                 const addSongRequest: AddSongRequest = data;
 
@@ -52,7 +49,7 @@ export class SocketHandler {
                     ack({ status: 'success' });
                 }).catch((error) => {
                     console.log("Error adding song to session", error)
-                    ack({ status: 'error', message: "Failed to add song to session with error" });
+                    // ack({ status: 'error', message: "Failed to add song to session with error" });
                 });
             });
 
