@@ -1,16 +1,6 @@
 name: Node.js CI
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - edited
-    branches: 
-      - main
+on: [push, pull_request]
 
 jobs:
   test-and-lint:
