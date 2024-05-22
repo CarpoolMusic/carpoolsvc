@@ -16,7 +16,7 @@ export class DBAccessor {
         this.pool = pool;
     }
 
-    async getUserByEmail(email: string): Promise<User | undefined> {
+    async getUserByEmail(email: string): Promise<User | null> {
         try {
             const result = await this.pool.query('SELECT * FROM users WHERE email = $1', [email]);
             const user = result.rows[0] as User;

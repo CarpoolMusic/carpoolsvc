@@ -5,6 +5,7 @@
     },
     "CreateSessionRequest": {
         "hostId": "string",
+        "socketId": "string",
         "sessionName": "string"
     },
     "CreateSessionResponse": {
