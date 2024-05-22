@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { DBAccessor, User } from '../../db/dbAccessor';
+import { DBAccessor, User } from '../../../db/dbAccessor';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('DBAccessor', () => {
