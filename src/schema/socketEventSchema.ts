@@ -8,41 +8,41 @@
 // match the expected interface, even if the JSON is valid.
 
 export interface SocketEventSchema {
-    LoginRequest: LoginRequest;
-    CreateSessionRequest: CreateSessionRequest;
+    LoginRequest:          LoginRequest;
+    CreateSessionRequest:  CreateSessionRequest;
     CreateSessionResponse: CreateSessionResponse;
-    JoinSessionRequest: JoinSessionRequest;
-    JoinSessionResponse: JoinSessionResponse;
-    Song: Song;
-    AddSongRequest: AddSongRequest;
-    SongAddedEvent: SongAddedEvent;
-    RemoveSongRequest: RemoveSongRequest;
-    SongRemovedEvent: SongRemovedEvent;
-    VoteSongRequest: VoteSongRequest;
-    VoteSongEvent: VoteSongEvent;
-    ErrorResponse: ErrorResponse;
+    JoinSessionRequest:    JoinSessionRequest;
+    JoinSessionResponse:   JoinSessionResponse;
+    Song:                  Song;
+    AddSongRequest:        AddSongRequest;
+    SongAddedEvent:        SongAddedEvent;
+    RemoveSongRequest:     RemoveSongRequest;
+    SongRemovedEvent:      SongRemovedEvent;
+    VoteSongRequest:       VoteSongRequest;
+    VoteSongEvent:         VoteSongEvent;
+    ErrorResponse:         ErrorResponse;
 }
 
 export interface AddSongRequest {
     sessionId: string;
-    song: Song;
+    song:      Song;
 }
 
 export interface Song {
-    id: string;
-    appleID: string;
-    spotifyID: string;
-    uri: string;
-    title: string;
-    artist: string;
-    album: string;
+    id:         string;
+    appleID:    string;
+    spotifyID:  string;
+    uri:        string;
+    title:      string;
+    artist:     string;
+    album:      string;
     artworkUrl: string;
-    votes: number;
+    votes:      number;
 }
 
 export interface CreateSessionRequest {
-    hostId: string;
-    socketId: string;
+    hostId:      string;
+    socketId:    string;
     sessionName: string;
 }
 
@@ -51,14 +51,14 @@ export interface CreateSessionResponse {
 }
 
 export interface ErrorResponse {
-    type: string;
-    message: string;
+    type:        string;
+    message:     string;
     stack_trace: string;
 }
 
 export interface JoinSessionRequest {
     sessionId: string;
-    userId: string;
+    userId:    string;
 }
 
 export interface JoinSessionResponse {
@@ -67,7 +67,7 @@ export interface JoinSessionResponse {
 
 export interface User {
     socketId: string;
-    userId: string;
+    userId:   string;
 }
 
 export interface LoginRequest {
@@ -77,7 +77,7 @@ export interface LoginRequest {
 
 export interface RemoveSongRequest {
     sessionId: string;
-    id: string;
+    id:        string;
 }
 
 export interface SongAddedEvent {
@@ -89,14 +89,14 @@ export interface SongRemovedEvent {
 }
 
 export interface VoteSongEvent {
-    id: string;
+    id:   string;
     vote: number;
 }
 
 export interface VoteSongRequest {
     sessionId: string;
-    id: string;
-    vote: number;
+    id:        string;
+    vote:      number;
 }
 
 // Converts JSON strings to/from your types
@@ -163,7 +163,7 @@ function transform(val: any, typ: any, getProps: any, key: any = '', parent: any
             const typ = typs[i];
             try {
                 return transform(val, typ, getProps);
-            } catch (_) { }
+            } catch (_) {}
         }
         return invalidValue(typs, val, key, parent);
     }
@@ -222,9 +222,9 @@ function transform(val: any, typ: any, getProps: any, key: any = '', parent: any
     if (Array.isArray(typ)) return transformEnum(typ, val);
     if (typeof typ === "object") {
         return typ.hasOwnProperty("unionMembers") ? transformUnion(typ.unionMembers, val)
-            : typ.hasOwnProperty("arrayItems") ? transformArray(typ.arrayItems, val)
-                : typ.hasOwnProperty("props") ? transformObject(getProps(typ), typ.additional, val)
-                    : invalidValue(typ, val, key, parent);
+            : typ.hasOwnProperty("arrayItems")    ? transformArray(typ.arrayItems, val)
+            : typ.hasOwnProperty("props")         ? transformObject(getProps(typ), typ.additional, val)
+            : invalidValue(typ, val, key, parent);
     }
     // Numbers can be parsed by Date but shouldn't be.
     if (typ === Date && typeof val !== "number") return transformDate(val);

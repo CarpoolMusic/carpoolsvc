@@ -58,7 +58,7 @@ router.post('/create-session', (req: Request, res: Response) => {
 
         console.log(hostId, socketId, sessionName);
 
-        if ((!hostId) || (!socketId) || (!sessionName) === undefined) {
+        if ((!hostId) || (!sessionName) === undefined) {
             return res.status(400).json({ success: false, message: 'Session name is required' });
         }
 
