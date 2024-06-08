@@ -5,10 +5,7 @@ FROM node:latest
 WORKDIR /workspaces
 
 # Install TypeScript globally
-RUN npm install -g typescript
-
-# Install ts-node globally
-RUN npm install -g ts-node
+RUN npm install -g ts-node typescript tsconfig-paths
 
 # Copy package.json and package-lock.json for installing dependencies
 COPY package*.json ./

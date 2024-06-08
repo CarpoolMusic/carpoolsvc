@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   app:
@@ -9,7 +9,12 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://root:jam@db:5432/carpooldb
+      - JWT_SECRET=your_jwt_secret
+    command: sh -c "npm run migrate:latest && npm start"
 
   db:
     image: "postgres:16"
