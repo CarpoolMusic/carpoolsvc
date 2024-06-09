@@ -18,7 +18,6 @@ const searchUrl = `${BASE_URL}/catalog/${storefront}/search`;
 const query = encodeURIComponent(`${song.title} ${song.artist} ${song.album}`);
 const url = `${searchUrl}?term=${query}&types=songs&limit=1`;
 export const mockAppleSearch200 = (): void => {
-    console.log('mocked url', url);
     fetchMock.get(url, {
         status: 200,
         body: {

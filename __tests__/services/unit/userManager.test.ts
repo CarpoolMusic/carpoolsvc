@@ -1,13 +1,14 @@
 import bcrypt from 'bcrypt';
 import { UserManager } from '../../../src/services/userManager';
-import { DBAccessor, User } from '../../../db/dbAccessor';
+import { User } from '../../../src/db/dbAccessor';
+import type { IDBAccessor } from '../../../src//db/dbAccessor';
 import { Pool } from 'pg';
 
 jest.mock('bcrypt');
-jest.mock('../../../db/dbAccessor');
+jest.mock('../../../src/db/dbAccessor');
 
 describe('UserManager', () => {
-    let dbAccessorMock: jest.Mocked<DBAccessor>;
+    let dbAccessorMock: jest.Mocked<IDBAccessor>;
     let userManager: UserManager;
     const mockUser: User = {
         id: '1',
@@ -18,13 +19,12 @@ describe('UserManager', () => {
     };
 
     beforeEach(() => {
-        const pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: {
-                rejectUnauthorized: true
-            }
-        });
-        dbAccessorMock = new DBAccessor(pool) as jest.Mocked<DBAccessor>;
+        dbAccessorMock = {
+            getUserByEmail: jest.fn(),
+            insertUser: jest.fn(),
+            // Add other methods if needed
+        } as unknown as jest.Mocked<IDBAccessor>;
+
         userManager = new UserManager(dbAccessorMock);
     });
 

@@ -19,7 +19,7 @@ class SpotifyMusicService {
     }
 
     public async requestToken(): Promise<string> {
-        if (this.lastTokenFetchSeconds != null) {
+        if (this.lastTokenFetchSeconds) {
             const secondsSinceLastFetch = (Date.now() - this.lastTokenFetchSeconds) / 1000;
             if (secondsSinceLastFetch < 3600) {
                 return this.accessToken;
@@ -52,14 +52,14 @@ class SpotifyMusicService {
     }
 
     private buildQuery(song: Song): string {
-        if (song.title === "") {
+        if (!song.title) {
             throw new Error('Song must have a title');
         }
 
         const queryParts = [
             `${song.title} track:${song.title}`,
-            (song.artist !== "") ? `artist:${song.artist}` : '',
-            (song.album !== "") ? `album:${song.album}` : '',
+            (song.artist) ? `artist:${song.artist}` : '',
+            (song.album) ? `album:${song.album}` : '',
         ];
 
         const query = queryParts.filter(Boolean).join(' ');

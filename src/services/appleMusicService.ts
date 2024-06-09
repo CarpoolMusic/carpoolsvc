@@ -25,7 +25,7 @@ class AppleMusicService {
     }
 
     private generateToken(): string {
-        if (this.lastTokenFetchSeconds != null) {
+        if (this.lastTokenFetchSeconds) {
             // check if token was fetched in last 180 days
             const secondsSinceLastFetch = (Date.now() - this.lastTokenFetchSeconds) / (1000 * 60 * 60 * 24);
             if (secondsSinceLastFetch < 180) {
@@ -47,14 +47,14 @@ class AppleMusicService {
     }
 
     private buildQuery(song: Song): string {
-        if (song.title === "") {
+        if (!song.title) {
             throw new Error('Song must have a title');
         }
 
         const queryParts = [
             song.title,
-            (song.artist !== "") ? song.artist : '',
-            (song.album !== "") ? song.album : '',
+            (song.artist) ? song.artist : '',
+            (song.album) ? song.album : '',
         ];
 
         const query = queryParts.join(' ');
@@ -80,7 +80,6 @@ class AppleMusicService {
             }
 
             const data = await response.json();
-            console.log('response:', data);
 
             // Assuming the first result is the desired one
             // You might want to add more robust logic to ensure the correct song is selected

@@ -7,7 +7,7 @@
 import Session from '../models/session';
 import { type User } from '../schema/socketEventSchema';
 
-class SessionManager {
+class MusicSessionManager {
     private readonly sessions: Map<string, Session>;
 
     constructor() {
@@ -27,7 +27,7 @@ class SessionManager {
 
     public joinSession(sessionId: string, User: User): void {
         const session = this.sessions.get(sessionId);
-        if (session != null) {
+        if (session) {
             session.join(User);
         } else {
             throw new Error('Invalid session ID ( join session )');
@@ -39,4 +39,4 @@ class SessionManager {
     }
 }
 
-export const sessionManager = new SessionManager();
+export const sessionManager = new MusicSessionManager();

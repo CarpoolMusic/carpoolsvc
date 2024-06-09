@@ -1,4 +1,5 @@
-import { Pool } from 'pg';
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { type Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface User {
@@ -8,12 +9,22 @@ export interface User {
     created_at: Date;
     updated_at: Date;
 }
+export interface IDBAccessor {
+    getUserByEmail: (email: string) => Promise<User | null>;
+    insertUser: (email: string, passwordHash: string) => Promise<string>;
+    deleteUserById: (id: string) => Promise<void>
+}
 
 export class DBAccessor {
     private readonly pool: Pool;
 
     constructor(pool: Pool) {
-        this.pool = pool;
+        this.pool = pool
+        void this.checkConnection();
+    }
+
+    deconstructor(): void {
+        void this.pool.end();
     }
 
     async getUserByEmail(email: string): Promise<User | null> {
@@ -22,7 +33,7 @@ export class DBAccessor {
             const user = result.rows[0] as User;
             return user;
         } catch (err) {
-            throw new Error(`Error fetching user by email: ${err}`);
+            throw new Error(`Error getting user ${err}`);
         }
     }
 
@@ -35,7 +46,7 @@ export class DBAccessor {
             );
             return result.rows[0].id;
         } catch (err) {
-            throw new Error(`Error inserting user: ${err}`);
+            throw new Error(`Error inserting user ${err}`);
         }
     }
 
@@ -43,7 +54,18 @@ export class DBAccessor {
         try {
             await this.pool.query('DELETE FROM users WHERE id = $1', [id]);
         } catch (err) {
-            throw new Error(`Error deleting user with id ${id}: ${err}`);
+            throw new Error(`Error deleting user ${err}`);
         }
     }
+
+    private async checkConnection(): Promise<void> {
+        try {
+            await this.pool.query('SELECT 1');
+            console.log('Database connection established successfully');
+        } catch (error) {
+            console.error('Failed to establish database connection:', error);
+            throw new Error('Failed to establish database connection');
+        }
+    }
+
 }

@@ -173,7 +173,6 @@ const createTestSession = (userId: string, sessionName: string): Promise<string>
 };
 
 const addTestSongToTestSession = (testSessionId: string): Promise<void> => {
-    console.log("TEST SESSION ID ", testSessionId);
     const song: Song = {
         votes: 0,
         id: testSongId,
