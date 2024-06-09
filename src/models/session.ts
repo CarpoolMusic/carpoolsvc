@@ -68,7 +68,7 @@ class Session {
 
     public getNumVotes(songId: string): number {
         const song = this.findSong(songId)
-        return (song != null) ? song.votes : 0;
+        return (song) ? song.votes : 0;
     }
 
     public voteOnSong(songId: string, vote: number): void {

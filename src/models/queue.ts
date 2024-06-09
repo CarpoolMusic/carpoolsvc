@@ -42,7 +42,7 @@ class Queue {
 
     public voteOnSong(songId: string, vote: number): void {
         const song = this.queue.find(song => song.id === songId);
-        if (song != null) {
+        if (song) {
             song.votes += vote;
         }
     }

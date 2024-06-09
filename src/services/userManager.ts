@@ -1,11 +1,19 @@
 // UserManager.ts
+import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
-import { type DBAccessor, type User } from '../../db/dbAccessor';
+import { type User, type IDBAccessor, DBAccessor } from '../../src/db/dbAccessor';
+
+export interface IUserManager {
+    getUserByEmail: (email: string) => Promise<User | null>;
+    comparePassword: (storedPasswordHash: string, providedPassword: string) => Promise<boolean>;
+    createUser: (id: string, email: string, passwordHash: string) => Promise<string>;
+}
 
 export class UserManager {
-    private readonly dbAccessor: DBAccessor;
 
-    constructor(dbAccessor: DBAccessor) {
+    private readonly dbAccessor: IDBAccessor;
+
+    constructor(dbAccessor: IDBAccessor) {
         this.dbAccessor = dbAccessor;
     }
 
@@ -13,7 +21,7 @@ export class UserManager {
         try {
             return await this.dbAccessor.getUserByEmail(email);
         } catch (err) {
-            throw new Error('Error fetching user by email');
+            throw new Error(`Error fetching user by email with error ${err}`);
         }
     }
 
@@ -33,3 +41,19 @@ export class UserManager {
         }
     }
 }
+
+const pool: Pool = new Pool({
+    host: 'db', // Use the service name defined in docker-compose.yml
+    user: 'root',
+    password: 'jam',
+    database: 'carpooldb',
+    port: 5432,
+});
+// const pool: Pool = new Pool({
+//     connectionString: process.env.DATABASE_URL,
+//     ssl: {
+//         rejectUnauthorized: true
+//     }
+// });
+const dbAccessor = new DBAccessor(pool);
+export const userManager = new UserManager(dbAccessor);
