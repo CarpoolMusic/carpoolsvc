@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import { UserManager } from '../../../src/services/userManager';
-import { User } from '../../../db/dbAccessor';
-import type { IDBAccessor } from '../../../db/dbAccessor';
+import { User } from '../../../src/db/dbAccessor';
+import type { IDBAccessor } from '../../../src//db/dbAccessor';
 import { Pool } from 'pg';
 
 jest.mock('bcrypt');
-jest.mock('../../../db/dbAccessor');
+jest.mock('../../../src/db/dbAccessor');
 
 describe('UserManager', () => {
     let dbAccessorMock: jest.Mocked<IDBAccessor>;
@@ -25,13 +25,6 @@ describe('UserManager', () => {
             // Add other methods if needed
         } as unknown as jest.Mocked<IDBAccessor>;
 
-        console.log(process.env.DATABASE_URL);
-        const pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: {
-                rejectUnauthorized: true
-            }
-        });
         userManager = new UserManager(dbAccessorMock);
     });
 
