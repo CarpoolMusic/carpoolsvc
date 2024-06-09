@@ -52,7 +52,7 @@ class SpotifyMusicService {
     }
 
     private buildQuery(song: Song): string {
-        if (song.title) {
+        if (!song.title) {
             throw new Error('Song must have a title');
         }
 
