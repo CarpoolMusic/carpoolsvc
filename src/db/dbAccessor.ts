@@ -11,6 +11,7 @@ export interface User {
 }
 export interface IDBAccessor {
     getUserByEmail: (email: string) => Promise<User | null>;
+    getUserByUsername: (username: string) => Promise<User | null>;
     insertUser: (email: string, passwordHash: string) => Promise<string>;
     deleteUserById: (id: string) => Promise<void>
 }
@@ -20,7 +21,6 @@ export class DBAccessor {
 
     constructor(pool: Pool) {
         this.pool = pool
-        void this.checkConnection();
     }
 
     deconstructor(): void {
@@ -33,18 +33,28 @@ export class DBAccessor {
             const user = result.rows[0] as User;
             return user;
         } catch (err) {
-            throw new Error(`Error getting user ${err}`);
+            throw new Error(`Error getting user by email ${err}`);
+        }
+    }
+
+    async getUserByUsername(username: string): Promise<User | null> {
+        try {
+            const result = await this.pool.query('SELECT * FROM users WHERE username = $1', [username]);
+            const user = result.rows[0] as User;
+            return user;
+        } catch (err) {
+            throw new Error(`Error getting user by username ${err}`);
         }
     }
 
     async insertUser(email: string, passwordHash: string): Promise<string> {
         const id = uuidv4();
         try {
-            const result = await this.pool.query(
-                'INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
+            await this.pool.query(
+                'INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3)',
                 [id, email, passwordHash]
             );
-            return result.rows[0].id;
+            return id;
         } catch (err) {
             throw new Error(`Error inserting user ${err}`);
         }

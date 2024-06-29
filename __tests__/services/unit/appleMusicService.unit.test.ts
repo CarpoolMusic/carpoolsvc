@@ -26,9 +26,15 @@ const url = `${searchUrl}?term=${query}&types=songs&limit=1`;
 describe('AppleMusicService', () => {
     let service: AppleMusicService;
 
+    const originalConsoleError = console.error;
     beforeEach(() => {
         service = new AppleMusicService();
         fetchMock.restore(); // Ensure mocks are cleared before each test
+        console.error = jest.fn(); // Suppress console.error output
+    });
+    afterEach(() => {
+        fetchMock.restore(); // Clears any mocks to ensure clean state for next
+        console.error = originalConsoleError; // Restore console.error
     });
 
     it('should resolve song from Apple Music', async () => {
@@ -45,7 +51,4 @@ describe('AppleMusicService', () => {
         await expect(service.resolveFromAppleMusic(song, storefront)).rejects.toThrow();
     });
 
-    afterEach(() => {
-        fetchMock.restore(); // Clears any mocks to ensure clean state for next tests
-    });
 });

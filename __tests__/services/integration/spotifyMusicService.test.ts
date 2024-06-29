@@ -17,8 +17,14 @@ const market = 'US';
 let service: SpotifyMusicService;
 
 describe('SpotifyMusicService', () => {
+    const originalConsoleError = console.error;
     beforeEach(async () => {
         service = new SpotifyMusicService();
+        console.error = jest.fn(); // Suppress console.error output
+    });
+    afterEach(() => {
+        // Clean up any resources used during the test
+        console.error = originalConsoleError; // Restore console.error
     });
 
     it('successfully resolves token', async () => {
@@ -48,7 +54,4 @@ describe('SpotifyMusicService', () => {
         await expect(service.resolveFromSpotify(song, market)).rejects.toThrow();
     });
 
-    afterEach(() => {
-        // Clean up any resources used during the test
-    });
 });

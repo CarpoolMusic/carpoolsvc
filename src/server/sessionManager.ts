@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import type { User } from 'src/db/dbAccessor';
+import type { User } from '@db/dbAccessor';
 
 dotenv.config();
 

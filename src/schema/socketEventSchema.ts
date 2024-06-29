@@ -9,6 +9,7 @@
 
 export interface SocketEventSchema {
     LoginRequest:          LoginRequest;
+    CreateUserRequest:     CreateUserRequest;
     CreateSessionRequest:  CreateSessionRequest;
     CreateSessionResponse: CreateSessionResponse;
     JoinSessionRequest:    JoinSessionRequest;
@@ -50,6 +51,12 @@ export interface CreateSessionResponse {
     sessionId: string;
 }
 
+export interface CreateUserRequest {
+    email:    string;
+    username: string;
+    password: string;
+}
+
 export interface ErrorResponse {
     type:        string;
     message:     string;
@@ -71,7 +78,7 @@ export interface User {
 }
 
 export interface LoginRequest {
-    username: string;
+    email:    string;
     password: string;
 }
 
@@ -266,6 +273,7 @@ function r(name: string) {
 const typeMap: any = {
     "SocketEventSchema": o([
         { json: "LoginRequest", js: "LoginRequest", typ: r("LoginRequest") },
+        { json: "CreateUserRequest", js: "CreateUserRequest", typ: r("CreateUserRequest") },
         { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: r("CreateSessionRequest") },
         { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: r("CreateSessionResponse") },
         { json: "JoinSessionRequest", js: "JoinSessionRequest", typ: r("JoinSessionRequest") },
@@ -302,6 +310,11 @@ const typeMap: any = {
     "CreateSessionResponse": o([
         { json: "sessionId", js: "sessionId", typ: "" },
     ], false),
+    "CreateUserRequest": o([
+        { json: "email", js: "email", typ: "" },
+        { json: "username", js: "username", typ: "" },
+        { json: "password", js: "password", typ: "" },
+    ], false),
     "ErrorResponse": o([
         { json: "type", js: "type", typ: "" },
         { json: "message", js: "message", typ: "" },
@@ -319,7 +332,7 @@ const typeMap: any = {
         { json: "userId", js: "userId", typ: "" },
     ], false),
     "LoginRequest": o([
-        { json: "username", js: "username", typ: "" },
+        { json: "email", js: "email", typ: "" },
         { json: "password", js: "password", typ: "" },
     ], false),
     "RemoveSongRequest": o([

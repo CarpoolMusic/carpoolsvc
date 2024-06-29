@@ -1,15 +1,22 @@
 import { Request, Response } from 'express';
-import { login } from '../../src/routes/login';
-import { userManager } from '../../src/services/userManager';
+import { login } from '@routes/login';
+import { userManager } from '@services/userManager';
 import bcrypt from 'bcrypt';
-import { sessionManager } from '../../src/services/musicSessionManager';
-import { generateAccessToken } from '../../src/sessionManager';
-import type { User } from '../../db/dbAccessor';
+import { generateAccessToken } from '../../../src/server/sessionManager';
+import type { User } from '@db/dbAccessor.ts';
 
 // Mock dependencies
-jest.mock('../services/userManager');
+jest.mock('carpoolsvc/src/services/userManager.ts');
 jest.mock('bcrypt');
-jest.mock('./sessionManager');
+jest.mock('carpoolsvc/src/server/sessionManager.ts');
+
+const originalConsoleError = console.error;
+beforeAll(() => {
+    console.error = jest.fn();
+});
+afterAll(() => {
+    console.error = originalConsoleError;
+});
 
 describe('login', () => {
     let req: Partial<Request>;
@@ -33,8 +40,8 @@ describe('login', () => {
         };
     });
 
-    it('should return 400 if username or password is not provided', async () => {
-        req.body = { username: '', password: '' };
+    it('should return 400 if email or password is not provided', async () => {
+        req.body = { email: '', password: '' };
 
         await login(req as Request, res as Response);
 
@@ -43,17 +50,17 @@ describe('login', () => {
     });
 
     it('should return 400 if user does not exist', async () => {
-        req.body = { username: 'nonexistent@example.com', password: 'password' };
+        req.body = { email: 'nonexistent@example.com', password: 'password' };
         (userManager.getUserByEmail as jest.Mock).mockResolvedValue(null);
 
         await login(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Invalid Username' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Invalid Email' });
     });
 
     it('should return 400 if password is invalid', async () => {
-        req.body = { username: 'test@example.com', password: 'wrongpassword' };
+        req.body = { email: 'test@example.com', password: 'wrongpassword' };
         (userManager.getUserByEmail as jest.Mock).mockResolvedValue(mockUser);
         (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
@@ -64,7 +71,7 @@ describe('login', () => {
     });
 
     it('should return 200 and a token if login is successful', async () => {
-        req.body = { username: 'test@example.com', password: 'password' };
+        req.body = { email: 'test@example.com', password: 'password' };
         (userManager.getUserByEmail as jest.Mock).mockResolvedValue(mockUser);
         (bcrypt.compare as jest.Mock).mockResolvedValue(true);
         (generateAccessToken as jest.Mock).mockReturnValue('fake-jwt-token');
@@ -76,7 +83,7 @@ describe('login', () => {
     });
 
     it('should return 500 if there is a server error', async () => {
-        req.body = { username: 'test@example.com', password: 'password' };
+        req.body = { email: 'test@example.com', password: 'password' };
         (userManager.getUserByEmail as jest.Mock).mockRejectedValue(new Error('Database error'));
 
         await login(req as Request, res as Response);
