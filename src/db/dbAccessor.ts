@@ -5,14 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 export interface User {
     id: string;
     email: string;
+    username: string | null;
     password_hash: string;
     created_at: Date;
     updated_at: Date;
 }
 export interface IDBAccessor {
+    getUserByEmailOrUsername: (email: string) => Promise<User | null>;
     getUserByEmail: (email: string) => Promise<User | null>;
-    getUserByUsername: (username: string) => Promise<User | null>;
-    insertUser: (email: string, passwordHash: string) => Promise<string>;
+    getUserByUsername: (email: string) => Promise<User | null>;
+    insertUser: (email: string, username: string | null, passwordHash: string) => Promise<string>;
     deleteUserById: (id: string) => Promise<void>
 }
 
@@ -27,34 +29,50 @@ export class DBAccessor {
         void this.pool.end();
     }
 
+    async getUserByEmailOrUsername(identifier: string): Promise<User | null> {
+        try {
+            const result = await this.pool.query(
+                'SELECT * FROM users WHERE email = $1 OR username = $1',
+                [identifier]
+            );
+            return result.rows[0] as User | null;
+        } catch (err) {
+            throw new Error(`Error getting user: ${err}`);
+        }
+    }
+
     async getUserByEmail(email: string): Promise<User | null> {
         try {
-            const result = await this.pool.query('SELECT * FROM users WHERE email = $1', [email]);
-            const user = result.rows[0] as User;
-            return user;
+            const result = await this.pool.query(
+                'SELECT * FROM users WHERE email = $1',
+                [email]
+            );
+            return result.rows[0] as User | null;
         } catch (err) {
-            throw new Error(`Error getting user by email ${err}`);
+            throw new Error(`Error getting user: ${err}`);
         }
     }
 
     async getUserByUsername(username: string): Promise<User | null> {
         try {
-            const result = await this.pool.query('SELECT * FROM users WHERE username = $1', [username]);
-            const user = result.rows[0] as User;
-            return user;
+            const result = await this.pool.query(
+                'SELECT * FROM users WHERE username = $1',
+                [username]
+            );
+            return result.rows[0] as User | null;
         } catch (err) {
-            throw new Error(`Error getting user by username ${err}`);
+            throw new Error(`Error getting user: ${err}`);
         }
     }
 
-    async insertUser(email: string, passwordHash: string): Promise<string> {
-        const id = uuidv4();
+    async insertUser(email: string, username: string | null, passwordHash: string): Promise<string> {
         try {
-            await this.pool.query(
-                'INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3)',
-                [id, email, passwordHash]
+            const result = await this.pool.query(
+                `INSERT INTO users (id, email, username, password_hash, created_at, updated_at) VALUES (uuid_generate_v4(), $1, $2, $3, NOW(), NOW())
+                RETURNING id`,
+                [email, username, passwordHash]
             );
-            return id;
+            return result.rows[0].id;
         } catch (err) {
             throw new Error(`Error inserting user ${err}`);
         }

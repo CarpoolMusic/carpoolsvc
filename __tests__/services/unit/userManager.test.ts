@@ -12,6 +12,7 @@ describe('UserManager', () => {
     const mockUser: User = {
         id: '1',
         email: 'test@example.com',
+        username: null,
         password_hash: 'hashed_password',
         created_at: new Date(),
         updated_at: new Date(),
@@ -19,7 +20,7 @@ describe('UserManager', () => {
 
     beforeEach(() => {
         dbAccessorMock = {
-            getUserByEmail: jest.fn(),
+            getUserByEmailOrUsername: jest.fn(),
             insertUser: jest.fn(),
             // Add other methods if needed
         } as unknown as jest.Mocked<IDBAccessor>;
@@ -32,17 +33,17 @@ describe('UserManager', () => {
     });
 
     it('should get a user by email', async () => {
-        dbAccessorMock.getUserByEmail.mockResolvedValue(mockUser);
+        dbAccessorMock.getUserByEmailOrUsername.mockResolvedValue(mockUser);
 
-        const user = await userManager.getUserByEmail(mockUser.email);
+        const user = await userManager.getUserByEmailOrUsername(mockUser.email);
         expect(user).toEqual(mockUser);
-        expect(dbAccessorMock.getUserByEmail).toHaveBeenCalledWith(mockUser.email);
+        expect(dbAccessorMock.getUserByEmailOrUsername).toHaveBeenCalledWith(mockUser.email);
     });
 
-    it('should throw an error when getUserByEmail fails', async () => {
-        dbAccessorMock.getUserByEmail.mockRejectedValue(new Error('Error fetching user by email'));
+    it('should throw an error when getUserByEmailOrUsername fails', async () => {
+        dbAccessorMock.getUserByEmailOrUsername.mockRejectedValue(new Error('Error fetching user by email'));
 
-        await expect(userManager.getUserByEmail(mockUser.email)).rejects.toThrow('Error fetching user by email');
+        await expect(userManager.getUserByEmailOrUsername(mockUser.email)).rejects.toThrow('Error fetching user by email');
     });
 
     it('should compare passwords correctly', async () => {
@@ -62,9 +63,9 @@ describe('UserManager', () => {
     it('should create a user', async () => {
         dbAccessorMock.insertUser.mockResolvedValue(mockUser.id);
 
-        const userId = await userManager.createUser(mockUser.id, mockUser.email, mockUser.password_hash);
+        const userId = await userManager.createUser(mockUser.email, mockUser.username, mockUser.password_hash);
+        expect(dbAccessorMock.insertUser).toHaveBeenCalledWith(mockUser.email, mockUser.username, mockUser.password_hash);
         expect(userId).toBe(mockUser.id);
-        expect(dbAccessorMock.insertUser).toHaveBeenCalledWith(mockUser.email, mockUser.password_hash);
     });
 
     it('should throw an error when createUser fails', async () => {

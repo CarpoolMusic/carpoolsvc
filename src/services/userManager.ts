@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { type User, type IDBAccessor, DBAccessor } from '../db/dbAccessor';
 
 export interface IUserManager {
-    getUserByEmail: (email: string) => Promise<User | null>;
+    getUserByEmailOrUsername: (email: string) => Promise<User | null>;
     comparePassword: (storedPasswordHash: string, providedPassword: string) => Promise<boolean>;
     createUser: (id: string, email: string, passwordHash: string) => Promise<string>;
 }
@@ -18,6 +18,14 @@ export class UserManager {
         this.dbAccessor = dbAccessor;
     }
 
+    async getUserByEmailOrUsername(identifier: string): Promise<User | null> {
+        try {
+            return await this.dbAccessor.getUserByEmailOrUsername(identifier);
+        } catch (err) {
+            throw new Error(`Error fetching user by identifier with error ${err}`);
+        }
+    }
+
     async getUserByEmail(email: string): Promise<User | null> {
         try {
             return await this.dbAccessor.getUserByEmail(email);
@@ -26,9 +34,9 @@ export class UserManager {
         }
     }
 
-    async getUserByUsername(username: string): Promise<User | null> {
+    async getUserByUsername(identifier: string): Promise<User | null> {
         try {
-            return await this.dbAccessor.getUserByUsername(username);
+            return await this.dbAccessor.getUserByUsername(identifier);
         } catch (err) {
             throw new Error(`Error fetching user by email with error ${err}`);
         }
@@ -42,9 +50,9 @@ export class UserManager {
         }
     }
 
-    async createUser(id: string, email: string, passwordHash: string): Promise<string> {
+    async createUser(email: string, username: string | null, passwordHash: string): Promise<string> {
         try {
-            return await this.dbAccessor.insertUser(email, passwordHash);
+            return await this.dbAccessor.insertUser(email, username, passwordHash);
         } catch (err) {
             throw new Error('Error creating user');
         }
