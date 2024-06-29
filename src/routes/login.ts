@@ -1,27 +1,27 @@
 import { type Request, type Response } from 'express';
 import bcrypt from 'bcrypt';
 import { userManager } from '../services/userManager';
-import { generateAccessToken } from '../sessionManager';
+import { generateAccessToken } from '../server/sessionManager';
 import type { LoginRequest } from '../schema/socketEventSchema';
 import type { User } from '../../src/db/dbAccessor';
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
     const body: LoginRequest = req.body;
-    const { username, password } = body;
+    const { email, password } = body;
 
     try {
         // Validate user input
-        console.log(username, password);
-        if (!username && !password) {
+        console.log(email, password);
+        if (!email || !password) {
             return res.status(400).json({ message: 'All input is required' });
         }
 
         // Retrieve user from database
-        const user: User | null = await userManager.getUserByEmail(username);
+        const user: User | null = await userManager.getUserByEmail(email);
 
         // Check if user exists
         if (!user) {
-            return res.status(400).json({ message: 'Invalid Username' });
+            return res.status(400).json({ message: 'Invalid Email' });
         }
 
         console.log("USER", user);

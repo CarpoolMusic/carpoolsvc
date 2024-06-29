@@ -1,11 +1,10 @@
 import bcrypt from 'bcrypt';
-import { UserManager } from '../../../src/services/userManager';
-import { User } from '../../../src/db/dbAccessor';
-import type { IDBAccessor } from '../../../src//db/dbAccessor';
-import { Pool } from 'pg';
+import { UserManager } from '@services/userManager';
+import { User } from '@db/dbAccessor';
+import type { IDBAccessor } from '@db/dbAccessor';
 
 jest.mock('bcrypt');
-jest.mock('../../../src/db/dbAccessor');
+jest.mock('@db/dbAccessor');
 
 describe('UserManager', () => {
     let dbAccessorMock: jest.Mocked<IDBAccessor>;
@@ -41,7 +40,7 @@ describe('UserManager', () => {
     });
 
     it('should throw an error when getUserByEmail fails', async () => {
-        dbAccessorMock.getUserByEmail.mockRejectedValue(new Error('DB error'));
+        dbAccessorMock.getUserByEmail.mockRejectedValue(new Error('Error fetching user by email'));
 
         await expect(userManager.getUserByEmail(mockUser.email)).rejects.toThrow('Error fetching user by email');
     });
@@ -55,7 +54,7 @@ describe('UserManager', () => {
     });
 
     it('should throw an error when comparePassword fails', async () => {
-        (bcrypt.compare as jest.Mock).mockRejectedValue(new Error('bcrypt error'));
+        (bcrypt.compare as jest.Mock).mockRejectedValue(new Error('Error comparing passwords'));
 
         await expect(userManager.comparePassword(mockUser.password_hash, 'provided_password')).rejects.toThrow('Error comparing passwords');
     });
@@ -69,7 +68,7 @@ describe('UserManager', () => {
     });
 
     it('should throw an error when createUser fails', async () => {
-        dbAccessorMock.insertUser.mockRejectedValue(new Error('DB error'));
+        dbAccessorMock.insertUser.mockRejectedValue(new Error('Error creating user'));
 
         await expect(userManager.createUser(mockUser.id, mockUser.email, mockUser.password_hash)).rejects.toThrow('Error creating user');
     });

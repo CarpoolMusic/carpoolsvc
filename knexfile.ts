@@ -14,7 +14,7 @@ const config: Record<string, Knex.Config> = {
       database: 'carpooldb'
     },
     migrations: {
-      directory: './db/schema/migrations',
+      directory: './src/db/schema/migrations',
       extension: 'ts',
     },
     seeds: {

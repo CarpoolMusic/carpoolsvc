@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 // UserManager.ts
 import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
-import { type User, type IDBAccessor, DBAccessor } from '../../src/db/dbAccessor';
+import { type User, type IDBAccessor, DBAccessor } from '../db/dbAccessor';
 
 export interface IUserManager {
     getUserByEmail: (email: string) => Promise<User | null>;
@@ -20,6 +21,14 @@ export class UserManager {
     async getUserByEmail(email: string): Promise<User | null> {
         try {
             return await this.dbAccessor.getUserByEmail(email);
+        } catch (err) {
+            throw new Error(`Error fetching user by email with error ${err}`);
+        }
+    }
+
+    async getUserByUsername(username: string): Promise<User | null> {
+        try {
+            return await this.dbAccessor.getUserByUsername(username);
         } catch (err) {
             throw new Error(`Error fetching user by email with error ${err}`);
         }

@@ -2,8 +2,8 @@ import dotenv from 'dotenv';
 
 import http from 'http';
 import express from 'express'
-import { setupMiddleware } from "./middleware"
 import { SocketHandler } from "./services/socketHandler"
+import { setupMiddleware } from "./server/middleware"
 import { Server } from 'socket.io';
 
 import sessionRoutes from './routes/userRoutes';
@@ -18,6 +18,7 @@ const port = 3000;
 const httpServer = http.createServer(app);
 const io = new Server(httpServer); // Fix: Use the Server class to create the io instance
 const socketHandler: SocketHandler = new SocketHandler(io);
+socketHandler.initializeSocketEvents();
 
 // Setup middleware.
 setupMiddleware(app);

@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   // All imported modules in your tests should be mocked automatically
@@ -90,7 +90,13 @@ const config: Config = {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    '^@server/(.*)$': '<rootDir>/server/$1',
+    '^@routes/(.*)$': '<rootDir>/src/routes/$1',
+    '^@db/(.*)$': '<rootDir>/src/db/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@schema/(.*)$': '<rootDir>/src/schema/$1',
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],

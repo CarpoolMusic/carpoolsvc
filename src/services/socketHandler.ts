@@ -13,10 +13,9 @@ export class SocketHandler {
 
     constructor(io: Server) {
         this.io = io;
-        this.initializeSocketEvents();
     }
 
-    private initializeSocketEvents(): void {
+    public initializeSocketEvents(): void {
         this.io.on('connection', (socket: Socket) => {
             socket.emit(EVENTS.CONNECTED);
 
