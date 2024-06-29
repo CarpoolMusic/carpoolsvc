@@ -25,7 +25,7 @@ describe('createUser', () => {
         await createUser(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ message: 'All input is required' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Email and password are required' });
     });
 
     it('should return 400 if email is already in use', async () => {
