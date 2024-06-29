@@ -7,28 +7,23 @@ import type { User } from '../../src/db/dbAccessor';
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
     const body: LoginRequest = req.body;
-    const { email, password } = body;
+    const { identifier, password } = body;
+
+    // Validate user input
+    if (!identifier || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
 
     try {
-        // Validate user input
-        console.log(email, password);
-        if (!email || !password) {
-            return res.status(400).json({ message: 'All input is required' });
-        }
-
-        // Retrieve user from database
-        const user: User | null = await userManager.getUserByEmail(email);
-
-        // Check if user exists
+        const user = await userManager.getUserByEmailOrUsername(identifier);
         if (!user) {
-            return res.status(400).json({ message: 'Invalid Email' });
+            return res.status(400).json({ message: 'Invalid username' });
         }
-
-        console.log("USER", user);
 
         // Check if password is valid
-        if (!(await bcrypt.compare(password, user.password_hash))) {
-            return res.status(400).json({ message: 'Invalid Password' });
+        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Invalid password' });
         }
 
         // Generate JWT token

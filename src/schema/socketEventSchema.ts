@@ -78,8 +78,8 @@ export interface User {
 }
 
 export interface LoginRequest {
-    email:    string;
-    password: string;
+    identifier: string;
+    password:   string;
 }
 
 export interface RemoveSongRequest {
@@ -332,7 +332,7 @@ const typeMap: any = {
         { json: "userId", js: "userId", typ: "" },
     ], false),
     "LoginRequest": o([
-        { json: "email", js: "email", typ: "" },
+        { json: "identifier", js: "identifier", typ: "" },
         { json: "password", js: "password", typ: "" },
     ], false),
     "RemoveSongRequest": o([

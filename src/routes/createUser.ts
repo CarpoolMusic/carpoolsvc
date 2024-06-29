@@ -2,6 +2,8 @@ import { type Request, type Response } from 'express';
 import type { CreateUserRequest } from '@schema/socketEventSchema';
 import { userManager } from '../services/userManager';  // Ensure correct path
 
+import bcrypt from 'bcrypt';
+
 /**
  * Creates a new user.
  *
@@ -14,8 +16,8 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
     const { email, username, password } = body;
 
     // Validate user input
-    if (!email || !username || !password) {
-        return res.status(400).json({ message: 'All input is required' });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
     }
 
     try {
@@ -23,8 +25,17 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         if (existingUser) {
             return res.status(400).json({ message: 'Email is already in use' });
         }
+        if (username) {
+            const existingUsername = await userManager.getUserByUsername(username);
+            if (existingUsername) {
+                return res.status(400).json({ message: 'Username is already in use' });
+            }
+        }
 
-        const userId = await userManager.createUser(email, username, password);
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const userId = await userManager.createUser(email, username, hashedPassword);
         return res.status(201).json({ userId });
     } catch (error) {
         console.error('Error creating user:', error);
