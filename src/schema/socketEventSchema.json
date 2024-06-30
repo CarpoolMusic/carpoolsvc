@@ -3,10 +3,17 @@
         "identifier": "string",
         "password": "string"
     },
+    "LoginResponse": {
+        "accessToken": "string",
+        "refreshToken": "string"
+    },
     "CreateUserRequest": {
         "email": "string",
         "username": "string",
         "password": "string"
+    },
+    "CreateUserResponse": {
+        "userId": "string"
     },
     "CreateSessionRequest": {
         "hostId": "string",
@@ -27,6 +34,13 @@
                 "userId": "string"
             }
         ]
+    },
+    "RefreshTokenRequest": {
+        "userId": "string",
+        "refreshToken": "string"
+    },
+    "RefreshTokenResponse": {
+        "accessToken": "string"
     },
     "Song": {
         "id": "string",

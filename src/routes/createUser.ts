@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import type { CreateUserRequest } from '@schema/socketEventSchema';
+import type { CreateUserRequest, CreateUserResponse } from '@schema/socketEventSchema';
 import { userManager } from '../services/userManager';  // Ensure correct path
 
 import bcrypt from 'bcrypt';
@@ -36,7 +36,9 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const userId = await userManager.createUser(email, username, hashedPassword);
-        return res.status(201).json({ userId });
+        const response: CreateUserResponse = { userId };
+        console.log(response);
+        return res.status(201).json(response);
     } catch (error) {
         console.error('Error creating user:', error);
         return res.status(500).json({ message: 'Internal server error' });

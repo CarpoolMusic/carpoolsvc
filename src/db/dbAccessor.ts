@@ -1,20 +1,16 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { type Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
+import { User } from '@models/user';
 
-export interface User {
-    id: string;
-    email: string;
-    username: string | null;
-    password_hash: string;
-    created_at: Date;
-    updated_at: Date;
-}
 export interface IDBAccessor {
     getUserByEmailOrUsername: (email: string) => Promise<User | null>;
-    getUserByEmail: (email: string) => Promise<User | null>;
-    getUserByUsername: (email: string) => Promise<User | null>;
+    getUserByEmail: (email: string) => Promise<User | null>; getUserByUsername: (email: string) => Promise<User | null>;
+    getUserById: (id: string) => Promise<User | null>;
+    getUserRefreshTokenHash: (id: string) => Promise<string | null>;
     insertUser: (email: string, username: string | null, passwordHash: string) => Promise<string>;
+    updateUserPasswordHash: (id: string, passwordHash: string) => Promise<void>;
+    updateUserRefreshTokenHash: (id: string, refreshToken: string) => Promise<void>;
     deleteUserById: (id: string) => Promise<void>
 }
 
@@ -65,6 +61,30 @@ export class DBAccessor {
         }
     }
 
+    async getUserById(id: string): Promise<User | null> {
+        try {
+            const result = await this.pool.query(
+                'SELECT * FROM users WHERE id = $1',
+                [id]
+            );
+            return result.rows[0] as User | null;
+        } catch (err) {
+            throw new Error(`Error getting user: ${err}`);
+        }
+    }
+
+    async getUserRefreshTokenHash(id: string): Promise<string | null> {
+        try {
+            const result = await this.pool.query(
+                'SELECT refresh_token_hash FROM users WHERE username = $1',
+                [id]
+            );
+            return result.rows[0] as string | null;
+        } catch (err) {
+            throw new Error(`Error getting user: ${err}`);
+        }
+    }
+
     async insertUser(email: string, username: string | null, passwordHash: string): Promise<string> {
         try {
             const result = await this.pool.query(
@@ -96,4 +116,11 @@ export class DBAccessor {
         }
     }
 
+    public async updateUserPasswordHash(id: string, passwordHash: string): Promise<void> {
+        await this.pool.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [passwordHash, id]);
+    }
+
+    public async updateUserRefreshTokenHash(id: string, refreshTokenHash: string): Promise<void> {
+        await this.pool.query('UPDATE users SET refresh_token_hash = $1, updated_at = NOW() WHERE id = $2', [refreshTokenHash, id]);
+    }
 }
