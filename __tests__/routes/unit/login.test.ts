@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
+import { LoginRequest, LoginResponse } from '@schema/socketEventSchema';
 import { login } from '@routes/login';
 import { userManager } from '@services/userManager';
 import bcrypt from 'bcrypt';
-import { generateAccessToken } from '../../../src/server/sessionManager';
-import type { User } from '@db/dbAccessor.ts';
+import { generateAccessToken, generateRefreshToken } from '../../../src/server/sessionManager';
+import { User } from '../../../src/models/user';
+import { refreshToken } from '@routes/refreshToken';
 
 // Mock dependencies
 jest.mock('carpoolsvc/src/services/userManager');
@@ -31,14 +33,14 @@ describe('login', () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
         };
-        mockUser = {
-            id: '1',
-            username: null,
-            email: 'test@example.com',
-            password_hash: 'hashedpassword',
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
+        mockUser = new User(
+            '1',
+            'test@example.com',
+            null,
+            'hashedpassword',
+            new Date(),
+            new Date(),
+        );
     });
 
     it('should return 400 if email or password is not provided', async () => {
@@ -71,16 +73,19 @@ describe('login', () => {
         expect(res.json).toHaveBeenCalledWith({ message: 'Invalid password' });
     });
 
-    it('should return 200 and a token if login is successful', async () => {
-        req.body = { identifier: 'test@example.com', password: 'password' };
+    it('should return 200 token, access token, and refresh token if login is successful', async () => {
+        const request: LoginRequest = { identifier: 'test@example.com', password: 'password' };
+        req.body = request;
         (userManager.getUserByEmailOrUsername as jest.Mock).mockResolvedValue(mockUser);
         (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-        (generateAccessToken as jest.Mock).mockReturnValue('fake-jwt-token');
+        (generateAccessToken as jest.Mock).mockReturnValue('accessToken');
+        (generateRefreshToken as jest.Mock).mockReturnValue('refreshToken');
 
         await login(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ token: 'fake-jwt-token' });
+
+        expect(res.json).toHaveBeenCalledWith({ accessToken: 'accessToken', refreshToken: 'refreshToken' });
     });
 
     it('should return 500 if there is a server error', async () => {
