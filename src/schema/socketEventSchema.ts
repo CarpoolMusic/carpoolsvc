@@ -9,11 +9,15 @@
 
 export interface SocketEventSchema {
     LoginRequest:          LoginRequest;
+    LoginResponse:         LoginResponse;
     CreateUserRequest:     CreateUserRequest;
+    CreateUserResponse:    CreateUserResponse;
     CreateSessionRequest:  CreateSessionRequest;
     CreateSessionResponse: CreateSessionResponse;
     JoinSessionRequest:    JoinSessionRequest;
     JoinSessionResponse:   JoinSessionResponse;
+    RefreshTokenRequest:   RefreshTokenRequest;
+    RefreshTokenResponse:  RefreshTokenResponse;
     Song:                  Song;
     AddSongRequest:        AddSongRequest;
     SongAddedEvent:        SongAddedEvent;
@@ -57,6 +61,10 @@ export interface CreateUserRequest {
     password: string;
 }
 
+export interface CreateUserResponse {
+    userId: string;
+}
+
 export interface ErrorResponse {
     type:        string;
     message:     string;
@@ -80,6 +88,20 @@ export interface User {
 export interface LoginRequest {
     identifier: string;
     password:   string;
+}
+
+export interface LoginResponse {
+    accessToken:  string;
+    refreshToken: string;
+}
+
+export interface RefreshTokenRequest {
+    userId:       string;
+    refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+    accessToken: string;
 }
 
 export interface RemoveSongRequest {
@@ -273,11 +295,15 @@ function r(name: string) {
 const typeMap: any = {
     "SocketEventSchema": o([
         { json: "LoginRequest", js: "LoginRequest", typ: r("LoginRequest") },
+        { json: "LoginResponse", js: "LoginResponse", typ: r("LoginResponse") },
         { json: "CreateUserRequest", js: "CreateUserRequest", typ: r("CreateUserRequest") },
+        { json: "CreateUserResponse", js: "CreateUserResponse", typ: r("CreateUserResponse") },
         { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: r("CreateSessionRequest") },
         { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: r("CreateSessionResponse") },
         { json: "JoinSessionRequest", js: "JoinSessionRequest", typ: r("JoinSessionRequest") },
         { json: "JoinSessionResponse", js: "JoinSessionResponse", typ: r("JoinSessionResponse") },
+        { json: "RefreshTokenRequest", js: "RefreshTokenRequest", typ: r("RefreshTokenRequest") },
+        { json: "RefreshTokenResponse", js: "RefreshTokenResponse", typ: r("RefreshTokenResponse") },
         { json: "Song", js: "Song", typ: r("Song") },
         { json: "AddSongRequest", js: "AddSongRequest", typ: r("AddSongRequest") },
         { json: "SongAddedEvent", js: "SongAddedEvent", typ: r("SongAddedEvent") },
@@ -315,6 +341,9 @@ const typeMap: any = {
         { json: "username", js: "username", typ: "" },
         { json: "password", js: "password", typ: "" },
     ], false),
+    "CreateUserResponse": o([
+        { json: "userId", js: "userId", typ: "" },
+    ], false),
     "ErrorResponse": o([
         { json: "type", js: "type", typ: "" },
         { json: "message", js: "message", typ: "" },
@@ -334,6 +363,17 @@ const typeMap: any = {
     "LoginRequest": o([
         { json: "identifier", js: "identifier", typ: "" },
         { json: "password", js: "password", typ: "" },
+    ], false),
+    "LoginResponse": o([
+        { json: "accessToken", js: "accessToken", typ: "" },
+        { json: "refreshToken", js: "refreshToken", typ: "" },
+    ], false),
+    "RefreshTokenRequest": o([
+        { json: "userId", js: "userId", typ: "" },
+        { json: "refreshToken", js: "refreshToken", typ: "" },
+    ], false),
+    "RefreshTokenResponse": o([
+        { json: "accessToken", js: "accessToken", typ: "" },
     ], false),
     "RemoveSongRequest": o([
         { json: "sessionId", js: "sessionId", typ: "" },

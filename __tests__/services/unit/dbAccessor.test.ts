@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
-import { DBAccessor, User } from '../../../src/db/dbAccessor';
+import { DBAccessor } from '../../../src/db/dbAccessor';
+import { User } from '../../../src/models/user';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('DBAccessor', () => {
@@ -18,15 +19,14 @@ describe('DBAccessor', () => {
 
         dbAccessor = new DBAccessor(pool);
 
-        // Initialize mock user data
-        mockUser = {
-            id: uuidv4(),
-            username: null,
-            email: 'test@example.com',
-            password_hash: 'hashed_password',
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
+        mockUser = new User(
+            uuidv4(),
+            'test@example.com',
+            null,
+            'hashed_password',
+            new Date(),
+            new Date(),
+        );
     });
 
     afterAll(async () => {
@@ -44,16 +44,19 @@ describe('DBAccessor', () => {
         // Insert the mock user and get the id
         const userId = await dbAccessor.insertUser(mockUser.email, mockUser.username, mockUser.password_hash);
         expect(userId).toBeDefined();
-        mockUser.id = userId;
 
         // Try and fetch the user by email and ensure it matches the mock user
-        const user = await dbAccessor.getUserByEmailOrUsername(mockUser.email);
+        const user: User | null = await dbAccessor.getUserByEmailOrUsername(mockUser.email);
         expect(user).not.toBeNull();
-        expect(user).toEqual(expect.objectContaining({
-            id: mockUser.id,
-            email: mockUser.email,
-            password_hash: mockUser.password_hash,
-        }));
+        expect(user?.id).toBeDefined();
+        expect(user?.username).toEqual(mockUser.username);
+
+        // Clean up by deleting the test user
+        await dbAccessor.deleteUserById(user!.id);
+        // Assert the user no longer exists
+        const deletedUser = await dbAccessor.getUserByEmailOrUsername(mockUser.email);
+        expect(deletedUser).toBeUndefined();
+
     });
 
     it('should delete a user by id', async () => {

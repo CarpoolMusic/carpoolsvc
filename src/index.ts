@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import 'tsconfig-paths/register';
 
 import http from 'http';
 import express from 'express'

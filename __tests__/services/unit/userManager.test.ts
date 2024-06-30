@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { UserManager } from '@services/userManager';
-import { User } from '@db/dbAccessor';
+import { User } from '../../../src/models/user';
 import type { IDBAccessor } from '@db/dbAccessor';
 
 jest.mock('bcrypt');
@@ -9,14 +9,14 @@ jest.mock('@db/dbAccessor');
 describe('UserManager', () => {
     let dbAccessorMock: jest.Mocked<IDBAccessor>;
     let userManager: UserManager;
-    const mockUser: User = {
-        id: '1',
-        email: 'test@example.com',
-        username: null,
-        password_hash: 'hashed_password',
-        created_at: new Date(),
-        updated_at: new Date(),
-    };
+    const mockUser = new User(
+        '1',
+        'test@example.com',
+        null,
+        'hashed_password',
+        new Date(),
+        new Date(),
+    );
 
     beforeEach(() => {
         dbAccessorMock = {
