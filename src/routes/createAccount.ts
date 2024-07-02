@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import type { CreateUserRequest, CreateUserResponse } from '@schema/socketEventSchema';
+import type { CreateAccountRequest, CreateAccountResponse } from '@schema/socketEventSchema';
 import { userManager } from '../services/userManager';  // Ensure correct path
 
 import bcrypt from 'bcrypt';
@@ -11,8 +11,8 @@ import bcrypt from 'bcrypt';
  * @param res - The response object.
  * @returns A Promise that resolves to a response object.
  */
-export const createUser = async (req: Request, res: Response): Promise<Response> => {
-    const body: CreateUserRequest = req.body;
+export const createAccount = async (req: Request, res: Response): Promise<Response> => {
+    const body: CreateAccountRequest = req.body;
     const { email, username, password } = body;
 
     // Validate user input
@@ -35,8 +35,8 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const userId = await userManager.createUser(email, username, hashedPassword);
-        const response: CreateUserResponse = { userId };
+        const userId = await userManager.createAccount(email, username, hashedPassword);
+        const response: CreateAccountResponse = { userId };
         console.log(response);
         return res.status(201).json(response);
     } catch (error) {

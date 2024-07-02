@@ -7,12 +7,12 @@
         "accessToken": "string",
         "refreshToken": "string"
     },
-    "CreateUserRequest": {
+    "CreateAccountRequest": {
         "email": "string",
         "username": "string",
         "password": "string"
     },
-    "CreateUserResponse": {
+    "CreateAccountResponse": {
         "userId": "string"
     },
     "CreateSessionRequest": {

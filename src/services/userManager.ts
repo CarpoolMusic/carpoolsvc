@@ -11,7 +11,7 @@ export interface IUserManager {
     getUserByUsername: (email: string) => Promise<User | null>;
     getUserRefreshTokenHash: (id: string) => Promise<User | null>;
     comparePassword: (storedPasswordHash: string, providedPassword: string) => Promise<boolean>;
-    createUser: (id: string, email: string, passwordHash: string) => Promise<string>;
+    createAccount: (id: string, email: string, passwordHash: string) => Promise<string>;
 }
 
 export class UserManager {
@@ -70,7 +70,7 @@ export class UserManager {
         }
     }
 
-    async createUser(email: string, username: string | null, passwordHash: string): Promise<string> {
+    async createAccount(email: string, username: string | null, passwordHash: string): Promise<string> {
         try {
             return await this.dbAccessor.insertUser(email, username, passwordHash);
         } catch (err) {
@@ -90,7 +90,7 @@ export class UserManager {
         try {
             await this.dbAccessor.updateUserRefreshTokenHash(id, refreshTokenHash);
         } catch (err) {
-            throw new Error('Error updating user refresh token');
+            throw new Error(`Error updating user refresh token ${err}`);
         }
     }
 }

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { userManager } from '../services/userManager';
 import { generateAccessToken, generateRefreshToken } from '../server/sessionManager';
 import type { LoginRequest, LoginResponse } from '../schema/socketEventSchema';
-import type { User } from '@models/user';
+import type { User } from '../models/user';
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
     const body: LoginRequest = req.body;
@@ -32,7 +32,8 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
         const hashedRefreshToken = await bcrypt.hash(refreshToken, saltRounds);
 
         // Store refresh token to later compare with the one sent by the client
-        user.updateRefreshTokenHash(hashedRefreshToken);
+        await userManager.updateUserRefreshTokenHash(user.id, hashedRefreshToken);
+
         const response: LoginResponse = { accessToken, refreshToken };
         return res.status(200).json(response);
 

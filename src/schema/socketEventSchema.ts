@@ -8,46 +8,46 @@
 // match the expected interface, even if the JSON is valid.
 
 export interface SocketEventSchema {
-    LoginRequest:          LoginRequest;
-    LoginResponse:         LoginResponse;
-    CreateUserRequest:     CreateUserRequest;
-    CreateUserResponse:    CreateUserResponse;
-    CreateSessionRequest:  CreateSessionRequest;
+    LoginRequest: LoginRequest;
+    LoginResponse: LoginResponse;
+    CreateAccountRequest: CreateAccountRequest;
+    CreateAccountResponse: CreateAccountResponse;
+    CreateSessionRequest: CreateSessionRequest;
     CreateSessionResponse: CreateSessionResponse;
-    JoinSessionRequest:    JoinSessionRequest;
-    JoinSessionResponse:   JoinSessionResponse;
-    RefreshTokenRequest:   RefreshTokenRequest;
-    RefreshTokenResponse:  RefreshTokenResponse;
-    Song:                  Song;
-    AddSongRequest:        AddSongRequest;
-    SongAddedEvent:        SongAddedEvent;
-    RemoveSongRequest:     RemoveSongRequest;
-    SongRemovedEvent:      SongRemovedEvent;
-    VoteSongRequest:       VoteSongRequest;
-    VoteSongEvent:         VoteSongEvent;
-    ErrorResponse:         ErrorResponse;
+    JoinSessionRequest: JoinSessionRequest;
+    JoinSessionResponse: JoinSessionResponse;
+    RefreshTokenRequest: RefreshTokenRequest;
+    RefreshTokenResponse: RefreshTokenResponse;
+    Song: Song;
+    AddSongRequest: AddSongRequest;
+    SongAddedEvent: SongAddedEvent;
+    RemoveSongRequest: RemoveSongRequest;
+    SongRemovedEvent: SongRemovedEvent;
+    VoteSongRequest: VoteSongRequest;
+    VoteSongEvent: VoteSongEvent;
+    ErrorResponse: ErrorResponse;
 }
 
 export interface AddSongRequest {
     sessionId: string;
-    song:      Song;
+    song: Song;
 }
 
 export interface Song {
-    id:         string;
-    appleID:    string;
-    spotifyID:  string;
-    uri:        string;
-    title:      string;
-    artist:     string;
-    album:      string;
+    id: string;
+    appleID: string;
+    spotifyID: string;
+    uri: string;
+    title: string;
+    artist: string;
+    album: string;
     artworkUrl: string;
-    votes:      number;
+    votes: number;
 }
 
 export interface CreateSessionRequest {
-    hostId:      string;
-    socketId:    string;
+    hostId: string;
+    socketId: string;
     sessionName: string;
 }
 
@@ -55,25 +55,25 @@ export interface CreateSessionResponse {
     sessionId: string;
 }
 
-export interface CreateUserRequest {
-    email:    string;
+export interface CreateAccountRequest {
+    email: string;
     username: string;
     password: string;
 }
 
-export interface CreateUserResponse {
+export interface CreateAccountResponse {
     userId: string;
 }
 
 export interface ErrorResponse {
-    type:        string;
-    message:     string;
+    type: string;
+    message: string;
     stack_trace: string;
 }
 
 export interface JoinSessionRequest {
     sessionId: string;
-    userId:    string;
+    userId: string;
 }
 
 export interface JoinSessionResponse {
@@ -82,21 +82,21 @@ export interface JoinSessionResponse {
 
 export interface User {
     socketId: string;
-    userId:   string;
+    userId: string;
 }
 
 export interface LoginRequest {
     identifier: string;
-    password:   string;
+    password: string;
 }
 
 export interface LoginResponse {
-    accessToken:  string;
+    accessToken: string;
     refreshToken: string;
 }
 
 export interface RefreshTokenRequest {
-    userId:       string;
+    userId: string;
     refreshToken: string;
 }
 
@@ -106,7 +106,7 @@ export interface RefreshTokenResponse {
 
 export interface RemoveSongRequest {
     sessionId: string;
-    id:        string;
+    id: string;
 }
 
 export interface SongAddedEvent {
@@ -118,14 +118,14 @@ export interface SongRemovedEvent {
 }
 
 export interface VoteSongEvent {
-    id:   string;
+    id: string;
     vote: number;
 }
 
 export interface VoteSongRequest {
     sessionId: string;
-    id:        string;
-    vote:      number;
+    id: string;
+    vote: number;
 }
 
 // Converts JSON strings to/from your types
@@ -192,7 +192,7 @@ function transform(val: any, typ: any, getProps: any, key: any = '', parent: any
             const typ = typs[i];
             try {
                 return transform(val, typ, getProps);
-            } catch (_) {}
+            } catch (_) { }
         }
         return invalidValue(typs, val, key, parent);
     }
@@ -251,9 +251,9 @@ function transform(val: any, typ: any, getProps: any, key: any = '', parent: any
     if (Array.isArray(typ)) return transformEnum(typ, val);
     if (typeof typ === "object") {
         return typ.hasOwnProperty("unionMembers") ? transformUnion(typ.unionMembers, val)
-            : typ.hasOwnProperty("arrayItems")    ? transformArray(typ.arrayItems, val)
-            : typ.hasOwnProperty("props")         ? transformObject(getProps(typ), typ.additional, val)
-            : invalidValue(typ, val, key, parent);
+            : typ.hasOwnProperty("arrayItems") ? transformArray(typ.arrayItems, val)
+                : typ.hasOwnProperty("props") ? transformObject(getProps(typ), typ.additional, val)
+                    : invalidValue(typ, val, key, parent);
     }
     // Numbers can be parsed by Date but shouldn't be.
     if (typ === Date && typeof val !== "number") return transformDate(val);
@@ -296,8 +296,8 @@ const typeMap: any = {
     "SocketEventSchema": o([
         { json: "LoginRequest", js: "LoginRequest", typ: r("LoginRequest") },
         { json: "LoginResponse", js: "LoginResponse", typ: r("LoginResponse") },
-        { json: "CreateUserRequest", js: "CreateUserRequest", typ: r("CreateUserRequest") },
-        { json: "CreateUserResponse", js: "CreateUserResponse", typ: r("CreateUserResponse") },
+        { json: "CreateAccountRequest", js: "CreateAccountRequest", typ: r("CreateAccountRequest") },
+        { json: "CreateAccountResponse", js: "CreateAccountResponse", typ: r("CreateAccountResponse") },
         { json: "CreateSessionRequest", js: "CreateSessionRequest", typ: r("CreateSessionRequest") },
         { json: "CreateSessionResponse", js: "CreateSessionResponse", typ: r("CreateSessionResponse") },
         { json: "JoinSessionRequest", js: "JoinSessionRequest", typ: r("JoinSessionRequest") },
@@ -336,12 +336,12 @@ const typeMap: any = {
     "CreateSessionResponse": o([
         { json: "sessionId", js: "sessionId", typ: "" },
     ], false),
-    "CreateUserRequest": o([
+    "CreateAccountRequest": o([
         { json: "email", js: "email", typ: "" },
         { json: "username", js: "username", typ: "" },
         { json: "password", js: "password", typ: "" },
     ], false),
-    "CreateUserResponse": o([
+    "CreateAccountResponse": o([
         { json: "userId", js: "userId", typ: "" },
     ], false),
     "ErrorResponse": o([
