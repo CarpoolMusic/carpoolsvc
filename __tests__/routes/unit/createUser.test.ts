@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { userManager } from '@services/userManager';
-import { createUser } from '@routes/createUser';
+import { createAccount } from '@routes/createAccount';
 
 // Mock dependencies
 jest.mock('../../../src/services/userManager');
 
-describe('createUser', () => {
+describe('createAccount', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
 
@@ -22,7 +22,7 @@ describe('createUser', () => {
     it('should return 400 if email, username, or password is not provided', async () => {
         req.body = { email: '', username: '', password: '' };
 
-        await createUser(req as Request, res as Response);
+        await createAccount(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ message: 'Email and password are required' });
@@ -38,7 +38,7 @@ describe('createUser', () => {
             updated_at: new Date(),
         });
 
-        await createUser(req as Request, res as Response);
+        await createAccount(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ message: 'Email is already in use' });
@@ -47,9 +47,9 @@ describe('createUser', () => {
     it('should return 201 and userId if user is created successfully', async () => {
         req.body = { email: 'test@example.com', username: 'testuser', password: 'testpassword' };
         (userManager.getUserByEmail as jest.Mock).mockResolvedValue(null);
-        (userManager.createUser as jest.Mock).mockResolvedValue('new-user-id');
+        (userManager.createAccount as jest.Mock).mockResolvedValue('new-user-id');
 
-        await createUser(req as Request, res as Response);
+        await createAccount(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.json).toHaveBeenCalledWith({ userId: 'new-user-id' });
@@ -59,7 +59,7 @@ describe('createUser', () => {
         req.body = { email: 'test@example.com', username: 'testuser', password: 'testpassword' };
         (userManager.getUserByEmail as jest.Mock).mockRejectedValue(new Error('Database error'));
 
-        await createUser(req as Request, res as Response);
+        await createAccount(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ message: 'Internal server error' });

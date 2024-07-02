@@ -15,11 +15,7 @@ export const generateAccessToken = (user: User): string => {
 };
 
 export const generateRefreshToken = (user: User): string => {
-    const token = generateToken(user, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRES_IN);
-
-    user.updateRefreshTokenHash(token);
-
-    return token;
+    return generateToken(user, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRES_IN);
 };
 
 const generateToken = (user: User, secret: string, expiry: string): string => {

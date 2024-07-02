@@ -63,14 +63,14 @@ describe('UserManager', () => {
     it('should create a user', async () => {
         dbAccessorMock.insertUser.mockResolvedValue(mockUser.id);
 
-        const userId = await userManager.createUser(mockUser.email, mockUser.username, mockUser.password_hash);
+        const userId = await userManager.createAccount(mockUser.email, mockUser.username, mockUser.password_hash);
         expect(dbAccessorMock.insertUser).toHaveBeenCalledWith(mockUser.email, mockUser.username, mockUser.password_hash);
         expect(userId).toBe(mockUser.id);
     });
 
-    it('should throw an error when createUser fails', async () => {
+    it('should throw an error when createAccount fails', async () => {
         dbAccessorMock.insertUser.mockRejectedValue(new Error('Error creating user'));
 
-        await expect(userManager.createUser(mockUser.id, mockUser.email, mockUser.password_hash)).rejects.toThrow('Error creating user');
+        await expect(userManager.createAccount(mockUser.id, mockUser.email, mockUser.password_hash)).rejects.toThrow('Error creating user');
     });
 });
